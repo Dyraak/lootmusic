@@ -6,112 +6,91 @@
 <title>LootMusic</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  background: #ffffff; color: #1a1a1a; font-family: 'Segoe UI', sans-serif;
-  min-height: 100vh; transition: background 0.4s, color 0.4s;
-}
+body { background: #ffffff; color: #1a1a1a; font-family: 'Segoe UI', sans-serif; min-height: 100vh; transition: background 0.4s, color 0.4s; }
 body.dark { background: #0d0d0d; color: #e0e0e0; }
-.app { text-align: center; padding: 20px; max-width: 420px; width: 100%; min-height: 100vh; margin: 0 auto; }
-.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-top: 10px; }
-.logo { font-size: 26px; font-weight: 900; letter-spacing: 2px; color: #4a90d9; }
+.app { text-align: center; padding: 15px; max-width: 450px; width: 100%; min-height: 100vh; margin: 0 auto; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-top: 8px; }
+.logo { font-size: 24px; font-weight: 900; letter-spacing: 2px; color: #4a90d9; }
 body.dark .logo { color: #2ecc71; }
-.theme-btn {
-  background: #f0f4f8; border: 2px solid #4a90d9; color: #1a1a1a;
-  font-size: 22px; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; transition: 0.3s;
-}
+.theme-btn { background: #f0f4f8; border: 2px solid #4a90d9; color: #1a1a1a; font-size: 20px; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; }
 body.dark .theme-btn { background: #1a1a1a; border-color: #2ecc71; color: #e0e0e0; }
-.tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
-.tab { background: #e8ecf1; border: none; padding: 10px 18px; border-radius: 25px; cursor: pointer; font-weight: 600; font-size: 14px; transition: 0.3s; color: #1a1a1a; }
+.tabs { display: flex; gap: 4px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center; }
+.tab { background: #e8ecf1; border: none; padding: 8px 12px; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 12px; color: #1a1a1a; }
 body.dark .tab { background: #1e1e1e; color: #ccc; }
 .tab.active { background: #4a90d9; color: #fff; }
 body.dark .tab.active { background: #2ecc71; color: #000; }
-.card {
-  background: #f0f4f8; border: 3px solid #888; border-radius: 20px; padding: 25px; margin-bottom: 12px;
-  min-height: 160px; display: flex; flex-direction: column; justify-content: center; align-items: center;
-  transition: border-color 0.5s, background 0.4s;
-}
+.card { background: #f0f4f8; border: 3px solid #888; border-radius: 20px; padding: 20px; margin-bottom: 10px; min-height: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
 body.dark .card { background: #1a1a1a; }
-.card.rare { border-color: #4a90d9; box-shadow: 0 0 20px rgba(74,144,217,0.3); }
-.card.epic { border-color: #9b59b6; box-shadow: 0 0 25px rgba(155,89,182,0.4); }
-.card.legendary { border-color: #f1c40f; box-shadow: 0 0 30px rgba(241,196,15,0.5); }
-.card-icon { font-size: 55px; margin-bottom: 10px; }
-.card-title { font-size: 19px; font-weight: 700; margin-bottom: 3px; }
-.card-artist { font-size: 14px; opacity: 0.7; margin-bottom: 4px; }
-.card-id { font-size: 10px; opacity: 0.4; margin-bottom: 6px; font-family: monospace; word-break: break-all; }
-.rarity-badge { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.card.rare { border-color: #4a90d9; box-shadow: 0 0 15px rgba(74,144,217,0.3); }
+.card.epic { border-color: #9b59b6; box-shadow: 0 0 20px rgba(155,89,182,0.4); }
+.card.legendary { border-color: #f1c40f; box-shadow: 0 0 25px rgba(241,196,15,0.5); }
+.card-icon { font-size: 45px; margin-bottom: 8px; }
+.card-title { font-size: 17px; font-weight: 700; }
+.card-artist { font-size: 13px; opacity: 0.7; margin-bottom: 4px; }
+.card-id { font-size: 9px; opacity: 0.4; font-family: monospace; }
+.rarity-badge { display: inline-block; padding: 3px 12px; border-radius: 15px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
 .rarity-common { background: #888; color: #fff; }
 .rarity-rare { background: #4a90d9; color: #fff; }
 .rarity-epic { background: #9b59b6; color: #fff; }
 .rarity-legendary { background: #f1c40f; color: #000; }
-.btn {
-  background: #4a90d9; color: #fff; border: none; padding: 12px 24px; font-size: 15px;
-  font-weight: 700; border-radius: 50px; cursor: pointer; letter-spacing: 1px; transition: 0.3s; width: 100%; margin-bottom: 6px;
-}
+.btn { background: #4a90d9; color: #fff; border: none; padding: 10px 20px; font-size: 14px; font-weight: 700; border-radius: 25px; cursor: pointer; width: 100%; margin-bottom: 5px; }
 body.dark .btn { background: #1a3d2c; color: #ccffcc; }
-.btn:disabled { opacity: 0.4; cursor: not-allowed; filter: none; transform: none; }
-.btn:hover:not(:disabled) { transform: scale(1.02); filter: brightness(1.15); }
-.timer { font-size: 13px; opacity: 0.7; margin-bottom: 12px; }
-.rarity-dropdown { position: relative; display: inline-block; margin-top: 8px; }
-.rarity-dropdown-btn {
-  background: #888; color: #fff; border: none; padding: 8px 18px; border-radius: 20px;
-  font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: 0.3s;
-}
-.rarity-dropdown-btn:hover { filter: brightness(1.2); }
-.rarity-dropdown-menu {
-  display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-  background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-  z-index: 10; overflow: hidden; min-width: 160px;
-}
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-small { font-size: 11px; padding: 6px 14px; width: auto; }
+.timer { font-size: 12px; opacity: 0.7; margin-bottom: 10px; }
+.rarity-dropdown { position: relative; display: inline-block; margin-top: 6px; }
+.rarity-dropdown-btn { background: #888; color: #fff; border: none; padding: 6px 14px; border-radius: 15px; font-size: 11px; font-weight: 700; cursor: pointer; }
+.rarity-dropdown-menu { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: #fff; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 10; min-width: 140px; }
 body.dark .rarity-dropdown-menu { background: #2a2a2a; }
 .rarity-dropdown-menu.show { display: block; }
-.rarity-option {
-  padding: 10px 16px; cursor: pointer; font-size: 13px; font-weight: 600;
-  transition: background 0.2s; text-align: left; display: flex; justify-content: space-between; gap: 12px;
-}
-.rarity-option:hover { background: #f0f0f0; }
-body.dark .rarity-option:hover { background: #3a3a3a; }
-.rarity-option.common { color: #888; }
-.rarity-option.rare { color: #4a90d9; }
-.rarity-option.epic { color: #9b59b6; }
-.rarity-option.legendary { color: #f1c40f; }
-.rarity-option .cost { opacity: 0.7; font-size: 11px; }
-.points { font-size: 12px; font-weight: 700; color: #f1c40f; margin-bottom: 4px; }
-.collection-item {
-  background: #f0f4f8; border-radius: 14px; padding: 14px; margin-bottom: 10px;
-  display: flex; align-items: center; gap: 12px; text-align: left; transition: background 0.3s; position: relative;
-}
+.rarity-option { padding: 8px 14px; cursor: pointer; font-size: 12px; font-weight: 600; display: flex; justify-content: space-between; }
+.rarity-option.common { color: #888; } .rarity-option.rare { color: #4a90d9; } .rarity-option.epic { color: #9b59b6; } .rarity-option.legendary { color: #f1c40f; }
+.points { font-size: 11px; font-weight: 700; color: #f1c40f; margin-bottom: 4px; }
+.collection-item { background: #f0f4f8; border-radius: 12px; padding: 10px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; text-align: left; }
 body.dark .collection-item { background: #1a1a1a; }
-.collection-icon { font-size: 36px; }
+.collection-icon { font-size: 30px; }
 .collection-info { flex: 1; }
-.collection-title { font-weight: 700; font-size: 15px; }
-.collection-artist { font-size: 13px; opacity: 0.6; }
-.collection-date { font-size: 11px; opacity: 0.4; margin-top: 2px; }
-.collection-id { font-size: 9px; opacity: 0.3; font-family: monospace; margin-top: 2px; word-break: break-all; }
-.modal {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 100;
-}
-.modal-box {
-  background: #fff; border-radius: 20px; padding: 30px; text-align: center; max-width: 340px; width: 90%;
-}
+.collection-title { font-weight: 700; font-size: 14px; }
+.collection-artist { font-size: 12px; opacity: 0.6; }
+.collection-date { font-size: 10px; opacity: 0.4; }
+.collection-id { font-size: 8px; opacity: 0.3; font-family: monospace; }
+.copy-btn { background: none; border: none; cursor: pointer; font-size: 10px; opacity: 0.5; }
+.chat-box { background: #f0f4f8; border-radius: 15px; padding: 10px; height: 250px; overflow-y: auto; text-align: left; margin-bottom: 8px; font-size: 13px; }
+body.dark .chat-box { background: #1a1a1a; }
+.chat-msg { padding: 4px 8px; margin-bottom: 3px; border-radius: 8px; background: #e0e4e8; }
+body.dark .chat-msg { background: #2a2a2a; }
+.chat-msg .nick { font-weight: 700; color: #4a90d9; font-size: 11px; }
+body.dark .chat-msg .nick { color: #2ecc71; }
+.chat-msg .time { font-size: 9px; opacity: 0.5; }
+.chat-input-row { display: flex; gap: 6px; }
+.chat-input-row input { flex: 1; padding: 8px 14px; border-radius: 20px; border: 2px solid #4a90d9; font-size: 13px; outline: none; }
+body.dark .chat-input-row input { background: #2a2a2a; border-color: #2ecc71; color: #fff; }
+.trade-section { background: #f0f4f8; border-radius: 15px; padding: 12px; margin-bottom: 10px; text-align: left; font-size: 13px; }
+body.dark .trade-section { background: #1a1a1a; }
+.trade-section h3 { font-size: 15px; margin-bottom: 8px; }
+.trade-section input { width: 100%; padding: 8px 12px; border-radius: 15px; border: 2px solid #4a90d9; font-size: 12px; margin-bottom: 6px; outline: none; }
+body.dark .trade-section input { background: #2a2a2a; border-color: #2ecc71; color: #fff; }
+.trade-card { background: #e0e4e8; border-radius: 10px; padding: 8px 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+body.dark .trade-card { background: #2a2a2a; }
+.trade-card .status { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 10px; }
+.status-pending { background: #f1c40f; color: #000; }
+.status-accepted { background: #2ecc71; color: #fff; }
+.status-rejected { background: #e74c3c; color: #fff; }
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 100; }
+.modal-box { background: #fff; border-radius: 20px; padding: 25px; text-align: center; max-width: 320px; width: 90%; }
 body.dark .modal-box { background: #1e1e1e; }
-.modal-box input {
-  width: 100%; padding: 12px 18px; border-radius: 30px;
-  border: 2px solid #4a90d9; font-size: 16px; margin: 10px 0; outline: none; text-align: center;
-}
+.modal-box input { width: 100%; padding: 10px 15px; border-radius: 25px; border: 2px solid #4a90d9; font-size: 14px; margin: 8px 0; outline: none; text-align: center; }
 body.dark .modal-box input { background: #2a2a2a; border-color: #2ecc71; color: #fff; }
-.modal-box h2 { margin-bottom: 5px; }
-.modal-box p { font-size: 13px; opacity: 0.7; margin-bottom: 5px; }
-.modal-link { color: #4a90d9; cursor: pointer; font-size: 14px; text-decoration: underline; margin-top: 10px; display: inline-block; }
-.empty { opacity: 0.5; padding: 40px; }
-audio { width: 100%; margin-top: 10px; border-radius: 8px; }
-.error-msg { color: #e74c3c; font-size: 13px; margin-top: 5px; display: none; }
-.copy-btn {
-  background: none; border: none; cursor: pointer; font-size: 12px; opacity: 0.5;
-  padding: 2px 6px; border-radius: 8px; transition: 0.2s;
-}
-.copy-btn:hover { opacity: 1; background: rgba(0,0,0,0.1); }
-body.dark .copy-btn:hover { background: rgba(255,255,255,0.1); }
+.modal-link { color: #4a90d9; cursor: pointer; font-size: 13px; text-decoration: underline; }
+.empty { opacity: 0.5; padding: 30px; }
+audio { width: 100%; margin-top: 8px; border-radius: 8px; height: 35px; }
+.error-msg { color: #e74c3c; font-size: 12px; display: none; }
+.suggestions { background: #fff; border-radius: 10px; max-height: 120px; overflow-y: auto; position: absolute; width: 90%; z-index: 5; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+body.dark .suggestions { background: #2a2a2a; }
+.suggest-item { padding: 8px 12px; cursor: pointer; font-size: 12px; border-bottom: 1px solid #eee; text-align: left; }
+body.dark .suggest-item { border-color: #444; }
+.suggest-item:hover { background: #f0f0f0; }
+body.dark .suggest-item:hover { background: #3a3a3a; }
 </style>
 </head>
 <body id="body">
@@ -120,48 +99,70 @@ body.dark .copy-btn:hover { background: rgba(255,255,255,0.1); }
     <div class="logo">LOOTMUSIC</div>
     <button class="theme-btn" onclick="toggleTheme()">🌙</button>
   </div>
-
   <div class="tabs">
     <button class="tab active" onclick="switchTab('crate')">🎁 Кейс</button>
     <button class="tab" onclick="switchTab('collection')">📦 Коллекция</button>
-    <button class="tab" onclick="switchTab('profile')">👤 Профиль</button>
+    <button class="tab" onclick="switchTab('trade')">🔄 Обмен</button>
+    <button class="tab" onclick="switchTab('chat')">💬 Чат</button>
+    <button class="tab" onclick="switchTab('profile')">👤</button>
   </div>
 
   <div id="tab-crate">
-    <div class="card" id="card">
-      <div class="card-icon">🎁</div>
-      <div class="card-title">??? ????</div>
-      <div class="card-artist">Unknown</div>
-      <span class="rarity-badge rarity-common">???</span>
-    </div>
+    <div class="card" id="card"><div class="card-icon">🎁</div><div class="card-title">??? ????</div><div class="card-artist">Unknown</div><span class="rarity-badge rarity-common">???</span></div>
     <button class="btn" id="openBtn" onclick="openCrate()">🔓 Открыть кейс</button>
     <div class="timer" id="timer"></div>
     <div id="raritySelector" style="display:none;">
-      <div class="points" id="pointsDisplay">⭐ Очков: 0</div>
+      <div class="points" id="pointsDisplay">⭐ 0</div>
       <div class="rarity-dropdown">
-        <button class="rarity-dropdown-btn" id="dropdownBtn" onclick="toggleDropdown()">Изменить редкость ▾</button>
+        <button class="rarity-dropdown-btn" id="dropdownBtn" onclick="toggleDropdown()">Редкость ▾</button>
         <div class="rarity-dropdown-menu" id="dropdownMenu">
-          <div class="rarity-option common" onclick="setRarity('common',0)">Common <span class="cost">0⭐</span></div>
-          <div class="rarity-option rare" onclick="setRarity('rare',1)">Rare <span class="cost">1⭐</span></div>
-          <div class="rarity-option epic" onclick="setRarity('epic',3)">Epic <span class="cost">3⭐</span></div>
-          <div class="rarity-option legendary" onclick="setRarity('legendary',5)">Legendary <span class="cost">5⭐</span></div>
+          <div class="rarity-option common" onclick="setRarity('common',0)">Common (0⭐)</div>
+          <div class="rarity-option rare" onclick="setRarity('rare',1)">Rare (1⭐)</div>
+          <div class="rarity-option epic" onclick="setRarity('epic',3)">Epic (3⭐)</div>
+          <div class="rarity-option legendary" onclick="setRarity('legendary',5)">Legendary (5⭐)</div>
         </div>
       </div>
     </div>
     <div id="player"></div>
   </div>
 
-  <div id="tab-collection" style="display:none;">
-    <div id="collectionList"><div class="empty">Пусто. Открой свой первый кейс!</div></div>
+  <div id="tab-collection" style="display:none;"><div id="collectionList"><div class="empty">Пусто</div></div></div>
+
+  <div id="tab-trade" style="display:none;">
+    <div class="trade-section">
+      <h3>🎁 Подарить трек</h3>
+      <input type="text" id="giftTrackInput" placeholder="Название или ID трека..." oninput="searchMyTracks('giftTrackInput','giftSuggest')">
+      <div class="suggestions" id="giftSuggest" style="display:none;"></div>
+      <input type="text" id="giftPlayerInput" placeholder="Никнейм игрока..." oninput="searchPlayers('giftPlayerInput','giftPlayerSuggest')">
+      <div class="suggestions" id="giftPlayerSuggest" style="display:none;"></div>
+      <button class="btn btn-small" onclick="sendGift()">🎁 Отправить</button>
+    </div>
+    <div class="trade-section">
+      <h3>🔄 Предложить обмен</h3>
+      <input type="text" id="myTrackInput" placeholder="Мой трек (название/ID)..." oninput="searchMyTracks('myTrackInput','myTrackSuggest')">
+      <div class="suggestions" id="myTrackSuggest" style="display:none;"></div>
+      <input type="text" id="theirTrackInput" placeholder="Трек игрока (название/ID)..." oninput="searchTheirTracks('theirTrackInput','theirTrackSuggest')">
+      <div class="suggestions" id="theirTrackSuggest" style="display:none;"></div>
+      <input type="text" id="tradePlayerInput" placeholder="Никнейм игрока..." oninput="searchPlayers('tradePlayerInput','tradePlayerSuggest')">
+      <div class="suggestions" id="tradePlayerSuggest" style="display:none;"></div>
+      <button class="btn btn-small" onclick="sendTrade()">🔄 Предложить</button>
+    </div>
+    <div id="activeTrades"><div class="empty">Нет активных обменов</div></div>
+  </div>
+
+  <div id="tab-chat" style="display:none;">
+    <div class="chat-box" id="chatBox"></div>
+    <div class="chat-input-row">
+      <input type="text" id="chatInput" placeholder="Сообщение..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="btn btn-small" onclick="sendChat()">→</button>
+    </div>
   </div>
 
   <div id="tab-profile" style="display:none;">
     <div class="card">
-      <div class="card-icon">👤</div>
-      <div class="card-title" id="profileName">-</div>
-      <div class="card-artist">Коллекционер</div>
-      <span class="rarity-badge rarity-common" id="profileCount">0 треков</span>
-      <div class="points" style="margin-top:10px;" id="profilePoints">⭐ Очков: 0</div>
+      <div class="card-icon">👤</div><div class="card-title" id="profileName">-</div>
+      <div class="card-artist" id="profileCount">0 треков</div>
+      <div class="points" id="profilePoints">⭐ 0</div>
     </div>
     <button class="btn" onclick="logout()">🚪 Выйти</button>
   </div>
@@ -172,22 +173,39 @@ body.dark .copy-btn:hover { background: rgba(255,255,255,0.1); }
     <h2>🎵 Вход</h2>
     <input type="text" id="loginNick" placeholder="Никнейм" maxlength="20">
     <input type="password" id="loginPass" placeholder="Пароль" maxlength="30">
-    <div class="error-msg" id="loginError">Неверный никнейм или пароль</div>
-    <button class="btn" onclick="login()" style="width:auto;padding:12px 30px;">Войти</button>
-    <span class="modal-link" onclick="showRegister()">Нет аккаунта? Создать</span>
+    <div class="error-msg" id="loginError">Неверно</div>
+    <button class="btn" onclick="login()">Войти</button>
+    <span class="modal-link" onclick="showRegister()">Создать аккаунт</span>
   </div>
   <div class="modal-box" id="registerBox" style="display:none;">
     <h2>🎵 Регистрация</h2>
     <input type="text" id="regNick" placeholder="Никнейм" maxlength="20">
     <input type="password" id="regPass" placeholder="Пароль" maxlength="30">
     <input type="password" id="regPass2" placeholder="Повтори пароль" maxlength="30">
-    <div class="error-msg" id="regError">Пароли не совпадают</div>
-    <button class="btn" onclick="register()" style="width:auto;padding:12px 30px;">Создать</button>
-    <span class="modal-link" onclick="showLogin()">Уже есть аккаунт? Войти</span>
+    <div class="error-msg" id="regError"></div>
+    <button class="btn" onclick="register()">Создать</button>
+    <span class="modal-link" onclick="showLogin()">Уже есть аккаунт</span>
   </div>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+import { getFirestore, collection, addDoc, query, where, onSnapshot, doc, updateDoc, deleteDoc, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+import { getDatabase, ref, push, onChildAdded, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAoAsjA5FHfQ7WglssP9_c6MV6mi_CL0Sw",
+  authDomain: "lootmusic-e6049.firebaseapp.com",
+  projectId: "lootmusic-e6049",
+  storageBucket: "lootmusic-e6049.firebasestorage.app",
+  messagingSenderId: "459404858144",
+  appId: "1:459404858144:web:d6977fa33535a7cb467d45"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const rtdb = getDatabase(app);
+
 const tracks = [
   { id:1, title:"Аппетит", artist:"Дайте танк (!)", icon:"🍽️", audio:"https://ru-d3.drivemusic.me/dl/yX8JSuNNpn_vvB3eP0PwNg/1783219830/download_music/2024/07/dajjte-tank-appetit.mp3" },
   { id:2, title:"Братик, выдыхай", artist:"Антон Небо", icon:"🌬️", audio:"https://ru-d3.drivemusic.me/dl/eQKgtyNjGVUB1kijrwMiMA/1783219954/download_music/2026/01/anton-nebo-bratik-vydykhajj.mp3" },
@@ -196,220 +214,263 @@ const tracks = [
   { id:5, title:"Нихуя", artist:"Щенки", icon:"💥", audio:"https://ru-d1.drivemusic.me/dl/Iki0ZEgO79Aexb6UhlbvxA/1783220160/download_music/2026/01/shhenki-nikhuja.mp3" }
 ];
 
-let user = null;
-let isDark = false;
-let usersDB = {};
-let currentTrack = null;
-
-function generateUID(nick) {
-  return nick + '-' + Date.now() + '-' + Math.random().toString(36).substring(2, 8);
-}
+let user = null; let isDark = false; let usersDB = {}; let currentTrack = null;
 
 function loadUsersDB() { const raw = localStorage.getItem('lootmusic_users'); if (raw) usersDB = JSON.parse(raw); }
 function saveUsersDB() { localStorage.setItem('lootmusic_users', JSON.stringify(usersDB)); }
 function saveUser() { if (user && usersDB[user.nick]) { usersDB[user.nick].data = user; saveUsersDB(); } }
 function loadUser() { const nick = localStorage.getItem('lootmusic_active'); if (nick && usersDB[nick]) user = usersDB[nick].data; }
+function generateUID(nick) { return nick + '-' + Date.now() + '-' + Math.random().toString(36).substring(2, 8); }
 
-function toggleTheme() {
+// Глобальные функции
+window.toggleTheme = function() {
   isDark = !isDark;
   document.getElementById('body').classList.toggle('dark', isDark);
   document.querySelector('.theme-btn').textContent = isDark ? '☀️' : '🌙';
   localStorage.setItem('lootmusic_theme', isDark ? 'dark' : 'light');
-}
+};
 
-function showRegister() { document.getElementById('loginBox').style.display='none'; document.getElementById('registerBox').style.display='block'; document.getElementById('regError').style.display='none'; }
-function showLogin() { document.getElementById('registerBox').style.display='none'; document.getElementById('loginBox').style.display='block'; document.getElementById('loginError').style.display='none'; }
+window.showRegister = function() { document.getElementById('loginBox').style.display='none'; document.getElementById('registerBox').style.display='block'; };
+window.showLogin = function() { document.getElementById('registerBox').style.display='none'; document.getElementById('loginBox').style.display='block'; };
 
-function register() {
+window.register = function() {
   const nick = document.getElementById('regNick').value.trim();
   const pass = document.getElementById('regPass').value;
   const pass2 = document.getElementById('regPass2').value;
   const err = document.getElementById('regError');
-  if (!nick || !pass) { err.textContent='Заполни все поля'; err.style.display='block'; return; }
+  if (!nick || !pass) { err.textContent='Заполни'; err.style.display='block'; return; }
   if (pass !== pass2) { err.textContent='Пароли не совпадают'; err.style.display='block'; return; }
-  if (usersDB[nick]) { err.textContent='Никнейм занят'; err.style.display='block'; return; }
+  if (usersDB[nick]) { err.textContent='Занят'; err.style.display='block'; return; }
   usersDB[nick] = { pass, data: { nick, collection: [], lastOpen: null, points: 2 } };
-  saveUsersDB();
-  user = usersDB[nick].data;
+  saveUsersDB(); user = usersDB[nick].data;
   localStorage.setItem('lootmusic_active', nick);
   document.getElementById('loginModal').style.display='none';
-  document.getElementById('regNick').value=''; document.getElementById('regPass').value=''; document.getElementById('regPass2').value='';
   switchTab('crate');
-}
+};
 
-function login() {
+window.login = function() {
   const nick = document.getElementById('loginNick').value.trim();
   const pass = document.getElementById('loginPass').value;
-  const err = document.getElementById('loginError');
-  if (!usersDB[nick] || usersDB[nick].pass !== pass) { err.style.display='block'; return; }
-  user = usersDB[nick].data;
-  localStorage.setItem('lootmusic_active', nick);
+  if (!usersDB[nick] || usersDB[nick].pass !== pass) { document.getElementById('loginError').style.display='block'; return; }
+  user = usersDB[nick].data; localStorage.setItem('lootmusic_active', nick);
   document.getElementById('loginModal').style.display='none';
-  document.getElementById('loginNick').value=''; document.getElementById('loginPass').value='';
-  err.style.display='none';
   switchTab('crate');
-}
+};
 
-function logout() {
-  if (confirm('Выйти из аккаунта?')) {
+window.logout = function() {
+  if (confirm('Выйти?')) {
     localStorage.removeItem('lootmusic_active'); user = null;
     document.getElementById('loginModal').style.display='flex'; showLogin();
     switchTab('crate');
-    document.getElementById('card').innerHTML = `<div class="card-icon">🎁</div><div class="card-title">??? ????</div><div class="card-artist">Unknown</div><span class="rarity-badge rarity-common">???</span>`;
-    document.getElementById('collectionList').innerHTML = '<div class="empty">Пусто. Открой свой первый кейс!</div>';
-    document.getElementById('player').innerHTML = '';
-    document.getElementById('raritySelector').style.display = 'none';
+    document.getElementById('card').innerHTML = '<div class="card-icon">🎁</div><div class="card-title">??? ????</div><div class="card-artist">Unknown</div><span class="rarity-badge rarity-common">???</span>';
+    document.getElementById('raritySelector').style.display='none';
     currentTrack = null;
   }
-}
+};
 
-function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active',
-    t.textContent.includes(tab==='crate'?'Кейс':tab==='collection'?'Коллекция':'Профиль')));
-  document.getElementById('tab-crate').style.display = tab==='crate'?'block':'none';
-  document.getElementById('tab-collection').style.display = tab==='collection'?'block':'none';
-  document.getElementById('tab-profile').style.display = tab==='profile'?'block':'none';
-  if (tab === 'collection') renderCollection();
-  if (tab === 'profile') {
-    document.getElementById('profileName').textContent = user?.nick || '-';
-    document.getElementById('profileCount').textContent = (user?.collection?.length||0) + ' треков';
-    document.getElementById('profilePoints').textContent = '⭐ Очков: ' + (user?.points||0);
-  }
+window.switchTab = function(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', false));
+  document.querySelectorAll('.tab').forEach(t => { if (t.textContent.includes(tab==='crate'?'Кейс':tab==='collection'?'Коллекция':tab==='trade'?'Обмен':tab==='chat'?'Чат':'👤')) t.classList.add('active'); });
+  ['crate','collection','trade','chat','profile'].forEach(t => document.getElementById('tab-'+t).style.display = t===tab?'block':'none');
+  if (tab==='collection') renderCollection();
+  if (tab==='profile') { document.getElementById('profileName').textContent=user?.nick||'-'; document.getElementById('profileCount').textContent=(user?.collection?.length||0)+' треков'; document.getElementById('profilePoints').textContent='⭐ '+(user?.points||0); }
+  if (tab==='trade') { loadActiveTrades(); }
   updateTimer();
-}
+};
 
-function canOpen() {
-  if (!user) return false;
-  if (!user.lastOpen) return true;
-  return (new Date().getTime() - new Date(user.lastOpen).getTime()) >= 2 * 60 * 60 * 1000;
-}
+window.toggleDropdown = function() { if (currentTrack && !currentTrack.rarityLocked) document.getElementById('dropdownMenu').classList.toggle('show'); };
 
+window.openCrate = function() {
+  if (!user) return alert('Войди!');
+  if (!canOpen()) return;
+  document.getElementById('openBtn').disabled = true;
+  document.getElementById('raritySelector').style.display='none';
+  setTimeout(() => {
+    currentTrack = {...tracks[Math.floor(Math.random()*tracks.length)]};
+    currentTrack.uid = generateUID(user.nick);
+    currentTrack.rarity='common'; currentTrack.obtainedAt=new Date().toISOString(); currentTrack.rarityLocked=false;
+    user.lastOpen=new Date().toISOString(); user.points=(user.points||0)+1;
+    user.collection.push(currentTrack); saveUser();
+    updateCard(currentTrack);
+    document.getElementById('raritySelector').style.display='block';
+    document.getElementById('pointsDisplay').textContent='⭐ '+user.points;
+    document.getElementById('player').innerHTML = '<audio controls autoplay><source src="'+currentTrack.audio+'" type="audio/mpeg"></audio>';
+    updateTimer();
+  },800);
+};
+
+window.setRarity = function(rarity,cost) {
+  if (!currentTrack||currentTrack.rarityLocked) return;
+  if (user.points < cost) return alert('Мало очков!');
+  user.points-=cost; currentTrack.rarity=rarity; currentTrack.rarityLocked=true;
+  const idx = user.collection.findIndex(t=>t.uid===currentTrack.uid);
+  if (idx>=0) user.collection[idx]=currentTrack;
+  saveUser(); updateCard(currentTrack);
+  document.getElementById('raritySelector').style.display='none';
+  document.getElementById('dropdownMenu').classList.remove('show');
+};
+
+window.searchMyTracks = function(inputId, suggestId) {
+  const val = document.getElementById(inputId).value.toLowerCase();
+  const s = document.getElementById(suggestId);
+  if (!val) { s.style.display='none'; return; }
+  const matches = (user?.collection||[]).filter(t => t.title.toLowerCase().includes(val) || t.uid.toLowerCase().includes(val) || t.artist.toLowerCase().includes(val));
+  if (!matches.length) { s.style.display='none'; return; }
+  s.innerHTML = matches.map(t => '<div class="suggest-item" onclick="selectTrack(\''+inputId+'\',\''+suggestId+'\',\''+t.uid+'\')">'+t.icon+' '+t.title+' - '+t.artist+' <span style=opacity:0.5>'+t.rarity+'</span></div>').join('');
+  s.style.display='block';
+};
+
+window.searchPlayers = function(inputId, suggestId) {
+  const val = document.getElementById(inputId).value.toLowerCase();
+  const s = document.getElementById(suggestId);
+  if (!val) { s.style.display='none'; return; }
+  const matches = Object.keys(usersDB).filter(n => n.toLowerCase().includes(val) && n !== user?.nick);
+  if (!matches.length) { s.style.display='none'; return; }
+  s.innerHTML = matches.map(n => '<div class="suggest-item" onclick="selectPlayer(\''+inputId+'\',\''+suggestId+'\',\''+n+'\')">👤 '+n+'</div>').join('');
+  s.style.display='block';
+};
+
+window.selectTrack = function(inputId, suggestId, uid) {
+  document.getElementById(inputId).value = uid;
+  document.getElementById(suggestId).style.display = 'none';
+};
+
+window.selectPlayer = function(inputId, suggestId, nick) {
+  document.getElementById(inputId).value = nick;
+  document.getElementById(suggestId).style.display = 'none';
+};
+
+window.sendGift = async function() {
+  const trackUid = document.getElementById('giftTrackInput').value.trim();
+  const targetNick = document.getElementById('giftPlayerInput').value.trim();
+  if (!trackUid || !targetNick) return alert('Заполни поля');
+  const track = user.collection.find(t => t.uid === trackUid);
+  if (!track) return alert('Трек не найден');
+  if (!usersDB[targetNick]) return alert('Игрок не найден');
+  try {
+    await addDoc(collection(db, 'gifts'), { from: user.nick, to: targetNick, track, timestamp: Date.now(), status: 'pending' });
+    alert('Подарок отправлен!');
+    document.getElementById('giftTrackInput').value = '';
+    document.getElementById('giftPlayerInput').value = '';
+  } catch(e) { alert('Ошибка'); }
+};
+
+window.sendTrade = async function() {
+  const myUid = document.getElementById('myTrackInput').value.trim();
+  const theirUid = document.getElementById('theirTrackInput').value.trim();
+  const targetNick = document.getElementById('tradePlayerInput').value.trim();
+  if (!myUid || !theirUid || !targetNick) return alert('Заполни все поля');
+  const myTrack = user.collection.find(t => t.uid === myUid);
+  if (!myTrack) return alert('Твой трек не найден');
+  if (!usersDB[targetNick]) return alert('Игрок не найден');
+  try {
+    await addDoc(collection(db, 'trades'), { from: user.nick, to: targetNick, fromTrack: myTrack, toTrackUid: theirUid, status: 'pending', timestamp: Date.now() });
+    alert('Обмен предложен!');
+    document.getElementById('myTrackInput').value = '';
+    document.getElementById('theirTrackInput').value = '';
+    document.getElementById('tradePlayerInput').value = '';
+    loadActiveTrades();
+  } catch(e) { alert('Ошибка'); }
+};
+
+window.acceptTrade = async function(tradeId) {
+  try {
+    const tradeRef = doc(db, 'trades', tradeId);
+    await updateDoc(tradeRef, { status: 'accepted' });
+    loadActiveTrades();
+  } catch(e) { alert('Ошибка'); }
+};
+
+window.rejectTrade = async function(tradeId) {
+  try {
+    const tradeRef = doc(db, 'trades', tradeId);
+    await updateDoc(tradeRef, { status: 'rejected' });
+    loadActiveTrades();
+  } catch(e) { alert('Ошибка'); }
+};
+
+window.sendChat = function() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg || !user) return;
+  push(ref(rtdb, 'chat'), { nick: user.nick, text: msg, time: Date.now() });
+  input.value = '';
+};
+
+window.copyID = function(uid) { navigator.clipboard.writeText(uid).then(()=>alert('Скопировано!')); };
+
+function canOpen() { if (!user) return false; if (!user.lastOpen) return true; return (Date.now()-new Date(user.lastOpen).getTime()) >= 2*60*60*1000; }
 function timeUntil() {
   if (!user?.lastOpen) return 'Можно открыть!';
-  const diff = 2*60*60*1000 - (new Date().getTime() - new Date(user.lastOpen).getTime());
-  if (diff <= 0) return 'Можно открыть!';
-  const h = Math.floor(diff/(1000*60*60));
-  const m = Math.floor((diff%(1000*60*60))/(1000*60));
-  const s = Math.floor((diff%(1000*60))/1000);
-  return `Следующий кейс через: ${h}ч ${m}м ${s}с`;
+  const diff = 2*60*60*1000 - (Date.now()-new Date(user.lastOpen).getTime());
+  if (diff<=0) return 'Можно открыть!';
+  return 'Через: '+Math.floor(diff/3600000)+'ч '+Math.floor((diff%3600000)/60000)+'м';
 }
 
 function updateTimer() {
-  const timerEl = document.getElementById('timer');
   const btn = document.getElementById('openBtn');
-  if (!user) { timerEl.textContent=''; btn.disabled=true; return; }
-  timerEl.textContent = timeUntil();
-  btn.disabled = !canOpen();
-  btn.textContent = canOpen() ? '🔓 Открыть кейс' : '⏳ Кейс уже открыт';
+  document.getElementById('timer').textContent = user ? timeUntil() : '';
+  if (user) { btn.disabled = !canOpen(); btn.textContent = canOpen()?'🔓 Открыть кейс':'⏳ Жди'; }
+  else btn.disabled = true;
 }
 
-function toggleDropdown() {
-  if (!currentTrack || currentTrack.rarityLocked) return;
-  document.getElementById('dropdownMenu').classList.toggle('show');
-}
-
-function openCrate() {
-  if (!user) return alert('Сначала войди!');
-  if (!canOpen()) return;
-  const btn = document.getElementById('openBtn');
-  btn.textContent = "⏳ Открываю...";
-  btn.disabled = true;
-  document.getElementById('raritySelector').style.display = 'none';
-  document.getElementById('dropdownMenu').classList.remove('show');
-  
-  setTimeout(() => {
-    currentTrack = {...tracks[Math.floor(Math.random() * tracks.length)]};
-    currentTrack.uid = generateUID(user.nick);
-    currentTrack.rarity = 'common';
-    currentTrack.obtainedAt = new Date().toISOString();
-    currentTrack.rarityLocked = false;
-    
-    user.lastOpen = new Date().toISOString();
-    user.points = (user.points || 0) + 1;
-    user.collection.push(currentTrack);
-    saveUser();
-    
-    updateCard(currentTrack);
-    document.getElementById('raritySelector').style.display = 'block';
-    document.getElementById('pointsDisplay').textContent = '⭐ Очков: ' + user.points;
-    document.getElementById('dropdownBtn').textContent = 'Изменить редкость ▾';
-    
-    document.getElementById('player').innerHTML = `
-      <audio controls autoplay>
-        <source src="${currentTrack.audio}" type="audio/mpeg">
-      </audio>`;
-    
-    updateTimer();
-  }, 800);
-}
-
-function updateCard(track) {
-  const card = document.getElementById('card');
-  card.className = 'card';
-  if (track.rarity !== 'common') card.classList.add(track.rarity);
-  card.innerHTML = `
-    <div class="card-icon">${track.icon}</div>
-    <div class="card-title">${track.title}</div>
-    <div class="card-artist">${track.artist}</div>
-    <span class="rarity-badge rarity-${track.rarity}">${track.rarity}</span>
-    <div class="card-id">ID: ${track.uid}</div>`;
-}
-
-function setRarity(rarity, cost) {
-  if (!currentTrack || currentTrack.rarityLocked) return;
-  if (user.points < cost) return alert('Не хватает очков! Нужно: ' + cost + ', у тебя: ' + user.points);
-  
-  user.points -= cost;
-  currentTrack.rarity = rarity;
-  currentTrack.rarityLocked = true;
-  
-  const idx = user.collection.findIndex(t => t.uid === currentTrack.uid);
-  if (idx >= 0) user.collection[idx] = currentTrack;
-  saveUser();
-  
-  updateCard(currentTrack);
-  document.getElementById('raritySelector').style.display = 'none';
-  document.getElementById('dropdownMenu').classList.remove('show');
-  document.getElementById('pointsDisplay').textContent = '⭐ Очков: ' + user.points;
-}
-
-function copyID(uid) {
-  navigator.clipboard.writeText(uid).then(() => {
-    alert('ID скопирован: ' + uid);
-  });
+function updateCard(t) {
+  const card = document.getElementById('card'); card.className='card';
+  if (t.rarity!=='common') card.classList.add(t.rarity);
+  card.innerHTML = '<div class="card-icon">'+t.icon+'</div><div class="card-title">'+t.title+'</div><div class="card-artist">'+t.artist+'</div><span class="rarity-badge rarity-'+t.rarity+'">'+t.rarity+'</span><div class="card-id">'+t.uid+'</div>';
 }
 
 function renderCollection() {
   const list = document.getElementById('collectionList');
-  if (!user?.collection?.length) { list.innerHTML = '<div class="empty">Пусто. Открой свой первый кейс!</div>'; return; }
+  if (!user?.collection?.length) { list.innerHTML='<div class="empty">Пусто</div>'; return; }
   list.innerHTML = [...user.collection].reverse().map(t => {
-    const d = new Date(t.obtainedAt);
-    const dateStr = d.toLocaleDateString('ru-RU', {day:'numeric',month:'long',year:'numeric'});
-    return `<div class="collection-item">
-      <div class="collection-icon">${t.icon}</div>
-      <div class="collection-info">
-        <div class="collection-title">${t.title}</div>
-        <div class="collection-artist">${t.artist}</div>
-        <div class="collection-date">${dateStr}</div>
-        <div class="collection-id">ID: ${t.uid} <button class="copy-btn" onclick="copyID('${t.uid}')" title="Копировать ID">📋</button></div>
-      </div>
-      <span class="rarity-badge rarity-${t.rarity}">${t.rarity}</span>
-    </div>`;
+    const d = new Date(t.obtainedAt).toLocaleDateString('ru-RU');
+    return '<div class="collection-item"><div class="collection-icon">'+t.icon+'</div><div class="collection-info"><div class="collection-title">'+t.title+'</div><div class="collection-artist">'+t.artist+'</div><div class="collection-date">'+d+'</div><div class="collection-id">'+t.uid+' <button class="copy-btn" onclick="copyID(\''+t.uid+'\')">📋</button></div></div><span class="rarity-badge rarity-'+t.rarity+'">'+t.rarity+'</span></div>';
   }).join('');
 }
 
+async function loadActiveTrades() {
+  const container = document.getElementById('activeTrades');
+  container.innerHTML = '<div class="empty">Загрузка...</div>';
+  try {
+    const q1 = query(collection(db, 'trades'), where('from', '==', user.nick));
+    const q2 = query(collection(db, 'trades'), where('to', '==', user.nick));
+    const s1 = await getDocs(q1); const s2 = await getDocs(q2);
+    let html = '';
+    s1.forEach(d => { const t = d.data(); html += tradeCard(d.id, t, 'Исходящий'); });
+    s2.forEach(d => { const t = d.data(); html += tradeCard(d.id, t, 'Входящий'); });
+    container.innerHTML = html || '<div class="empty">Нет активных обменов</div>';
+  } catch(e) { container.innerHTML = '<div class="empty">Ошибка загрузки</div>'; }
+}
+
+function tradeCard(id, t, dir) {
+  return '<div class="trade-card"><div>'+dir+': '+t.fromTrack.title+' ↔ '+t.toTrackUid+'<br><small>с '+ (dir==='Входящий'?t.from:t.to) +'</small></div><div><span class="status status-'+t.status+'">'+t.status+'</span>'+(t.status==='pending'&&dir==='Входящий'?' <button class="btn btn-small" onclick="acceptTrade(\''+id+'\')">✅</button> <button class="btn btn-small" onclick="rejectTrade(\''+id+'\')">❌</button>':'')+'</div></div>';
+}
+
+// Чат
+onChildAdded(ref(rtdb, 'chat'), (snap) => {
+  const msg = snap.val();
+  const box = document.getElementById('chatBox');
+  box.innerHTML += '<div class="chat-msg"><span class="nick">'+msg.nick+'</span> <span class="time">'+new Date(msg.time).toLocaleTimeString().slice(0,5)+'</span><br>'+msg.text+'</div>';
+  box.scrollTop = box.scrollHeight;
+});
+
+// Закрытие дропдаунов
 document.addEventListener('click', function(e) {
-  if (!e.target.closest('.rarity-dropdown')) {
-    document.getElementById('dropdownMenu').classList.remove('show');
-  }
+  if (!e.target.closest('.rarity-dropdown')) document.getElementById('dropdownMenu').classList.remove('show');
+  if (!e.target.closest('#giftTrackInput') && !e.target.closest('#giftSuggest')) document.getElementById('giftSuggest').style.display='none';
+  if (!e.target.closest('#giftPlayerInput') && !e.target.closest('#giftPlayerSuggest')) document.getElementById('giftPlayerSuggest').style.display='none';
+  if (!e.target.closest('#myTrackInput') && !e.target.closest('#myTrackSuggest')) document.getElementById('myTrackSuggest').style.display='none';
+  if (!e.target.closest('#theirTrackInput') && !e.target.closest('#theirTrackSuggest')) document.getElementById('theirTrackSuggest').style.display='none';
+  if (!e.target.closest('#tradePlayerInput') && !e.target.closest('#tradePlayerSuggest')) document.getElementById('tradePlayerSuggest').style.display='none';
 });
 
 // Init
 loadUsersDB(); loadUser();
-if (localStorage.getItem('lootmusic_theme') === 'dark') { isDark=true; document.getElementById('body').classList.add('dark'); document.querySelector('.theme-btn').textContent='☀️'; }
+if (localStorage.getItem('lootmusic_theme')==='dark') { isDark=true; document.getElementById('body').classList.add('dark'); document.querySelector('.theme-btn').textContent='☀️'; }
 if (!user) { document.getElementById('loginModal').style.display='flex'; document.getElementById('openBtn').disabled=true; }
 else { document.getElementById('loginModal').style.display='none'; }
-switchTab('crate');
+window.switchTab('crate');
 setInterval(updateTimer, 1000);
 </script>
 </body>
