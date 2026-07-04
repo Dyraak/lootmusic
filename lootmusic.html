@@ -172,6 +172,7 @@ body.dark .modal-box input {
   background: #2a2a2a; border-color: #2ecc71; color: #fff;
 }
 .empty { opacity: 0.5; padding: 40px; }
+audio { width: 100%; margin-top: 10px; }
 </style>
 </head>
 <body id="body">
@@ -196,6 +197,7 @@ body.dark .modal-box input {
     </div>
     <button class="btn" id="openBtn" onclick="openCrate()">🔓 Открыть кейс</button>
     <div class="timer" id="timer"></div>
+    <div id="player"></div>
   </div>
 
   <div id="tab-collection" style="display:none;">
@@ -224,13 +226,13 @@ body.dark .modal-box input {
 
 <script>
 const tracks = [
-  { id:1, title:"Neon Horizon", artist:"Synthwave Kid", rarity:"common", icon:"🎵" },
-  { id:2, title:"Midnight Echo", artist:"Luna Wave", rarity:"common", icon:"🎶" },
-  { id:3, title:"Crystal Cave", artist:"Deep Sound", rarity:"rare", icon:"💎" },
-  { id:4, title:"Storm Chaser", artist:"Volt Age", rarity:"rare", icon:"⚡" },
-  { id:5, title:"Astral Projection", artist:"Unknown Artist", rarity:"epic", icon:"🌌" },
-  { id:6, title:"Echo of Silence", artist:"The Void", rarity:"epic", icon:"🌀" },
-  { id:7, title:"Golden Record", artist:"Voyager", rarity:"legendary", icon:"👑" }
+  { id:1, title:"Утро", artist:"Дайте танк (!)", rarity:"common", icon:"🌅", audio:"https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Tours/Enthusiast/Tours_-_01_-_Enthusiast.mp3" },
+  { id:2, title:"Впереди", artist:"Дайте танк (!)", rarity:"common", icon:"🚀", audio:"https://files.freemusicarchive.org/storage-freemusicarchive-org/music/WFMU/Broke_For_Free/Directionless_EP/Broke_For_Free_-_01_-_Night_Owl.mp3" },
+  { id:3, title:"Люди", artist:"Дайте танк (!)", rarity:"rare", icon:"👥", audio:"https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Ketsa/Rainbow_Island/Ketsa_-_06_-_Secret_Sauce.mp3" },
+  { id:4, title:"Шум", artist:"Дайте танк (!)", rarity:"rare", icon:"📢", audio:"https://files.freemusicarchive.org/storage-freemusicarchive-org/music/WFMU/Blue_Dot_Sessions/The_Contessa/Blue_Dot_Sessions_-_02_-_Cholate.mp3" },
+  { id:5, title:"Волны", artist:"Дайте танк (!)", rarity:"epic", icon:"🌊", audio:"https://files.freemusicarchive.org/storage-freemusicarchive-org/music/WFMU/Blue_Dot_Sessions/Ray_Cat/Blue_Dot_Sessions_-_01_-_Ray_Cat.mp3" },
+  { id:6, title:"Слова", artist:"Дайте танк (!)", rarity:"epic", icon:"📝", audio:"https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Scott_Holmes/Scott_Holmes_-_02_-_We_Are_One.mp3" },
+  { id:7, title:"Танк", artist:"Дайте танк (!)", rarity:"legendary", icon:"🪖", audio:"https://files.freemusicarchive.org/storage-freemusicarchive-org/music/WFMU/Nul_Tiel_Records/nyan_cat/Nul_Tiel_Records_-_05_-_Nyan_Cat.mp3" }
 ];
 
 let user = null;
@@ -283,6 +285,7 @@ function logout() {
       <div class="card-icon">🎁</div><div class="card-title">??? ????</div>
       <div class="card-artist">Unknown</div><span class="rarity-badge rarity-common">???</span>`;
     document.getElementById('collectionList').innerHTML = '<div class="empty">Пусто. Открой свой первый кейс!</div>';
+    document.getElementById('player').innerHTML = '';
   }
 }
 
@@ -343,6 +346,12 @@ function openCrate() {
       <div class="card-title">${track.title}</div>
       <div class="card-artist">${track.artist}</div>
       <span class="rarity-badge rarity-${track.rarity}">${track.rarity}</span>`;
+    
+    document.getElementById('player').innerHTML = `
+      <audio controls autoplay>
+        <source src="${track.audio}" type="audio/mpeg">
+        Ваш браузер не поддерживает аудио.
+      </audio>`;
     
     updateTimer();
   }, 800);
