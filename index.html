@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LootMusic</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { background: #ffffff; color: #1a1a1a; font-family: 'Segoe UI', sans-serif; min-height: 100vh; transition: background 0.4s, color 0.4s; }
@@ -188,23 +191,20 @@ body.dark .suggest-item:hover { background: #3a3a3a; }
   </div>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
-import { getFirestore, collection, addDoc, query, where, onSnapshot, doc, updateDoc, deleteDoc, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
-import { getDatabase, ref, push, onChildAdded, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
-
+<script>
+// Firebase Init
 const firebaseConfig = {
   apiKey: "AIzaSyAoAsjA5FHfQ7WglssP9_c6MV6mi_CL0Sw",
   authDomain: "lootmusic-e6049.firebaseapp.com",
   projectId: "lootmusic-e6049",
   storageBucket: "lootmusic-e6049.firebasestorage.app",
   messagingSenderId: "459404858144",
-  appId: "1:459404858144:web:d6977fa33535a7cb467d45"
+  appId: "1:459404858144:web:d6977fa33535a7cb467d45",
+  databaseURL: "https://lootmusic-e6049-default-rtdb.europe-west1.firebasedatabase.app/"
 };
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const rtdb = getDatabase(app);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const rtdb = firebase.database();
 
 const tracks = [
   { id:1, title:"Аппетит", artist:"Дайте танк (!)", icon:"🍽️", audio:"https://ru-d3.drivemusic.me/dl/yX8JSuNNpn_vvB3eP0PwNg/1783219830/download_music/2024/07/dajjte-tank-appetit.mp3" },
@@ -214,7 +214,7 @@ const tracks = [
   { id:5, title:"Нихуя", artist:"Щенки", icon:"💥", audio:"https://ru-d1.drivemusic.me/dl/Iki0ZEgO79Aexb6UhlbvxA/1783220160/download_music/2026/01/shhenki-nikhuja.mp3" }
 ];
 
-let user = null; let isDark = false; let usersDB = {}; let currentTrack = null;
+let user = null, isDark = false, usersDB = {}, currentTrack = null;
 
 function loadUsersDB() { const raw = localStorage.getItem('lootmusic_users'); if (raw) usersDB = JSON.parse(raw); }
 function saveUsersDB() { localStorage.setItem('lootmusic_users', JSON.stringify(usersDB)); }
@@ -222,18 +222,17 @@ function saveUser() { if (user && usersDB[user.nick]) { usersDB[user.nick].data 
 function loadUser() { const nick = localStorage.getItem('lootmusic_active'); if (nick && usersDB[nick]) user = usersDB[nick].data; }
 function generateUID(nick) { return nick + '-' + Date.now() + '-' + Math.random().toString(36).substring(2, 8); }
 
-// Глобальные функции
-window.toggleTheme = function() {
+function toggleTheme() {
   isDark = !isDark;
   document.getElementById('body').classList.toggle('dark', isDark);
   document.querySelector('.theme-btn').textContent = isDark ? '☀️' : '🌙';
   localStorage.setItem('lootmusic_theme', isDark ? 'dark' : 'light');
-};
+}
 
-window.showRegister = function() { document.getElementById('loginBox').style.display='none'; document.getElementById('registerBox').style.display='block'; };
-window.showLogin = function() { document.getElementById('registerBox').style.display='none'; document.getElementById('loginBox').style.display='block'; };
+function showRegister() { document.getElementById('loginBox').style.display='none'; document.getElementById('registerBox').style.display='block'; }
+function showLogin() { document.getElementById('registerBox').style.display='none'; document.getElementById('loginBox').style.display='block'; }
 
-window.register = function() {
+function register() {
   const nick = document.getElementById('regNick').value.trim();
   const pass = document.getElementById('regPass').value;
   const pass2 = document.getElementById('regPass2').value;
@@ -246,41 +245,40 @@ window.register = function() {
   localStorage.setItem('lootmusic_active', nick);
   document.getElementById('loginModal').style.display='none';
   switchTab('crate');
-};
+}
 
-window.login = function() {
+function login() {
   const nick = document.getElementById('loginNick').value.trim();
   const pass = document.getElementById('loginPass').value;
   if (!usersDB[nick] || usersDB[nick].pass !== pass) { document.getElementById('loginError').style.display='block'; return; }
   user = usersDB[nick].data; localStorage.setItem('lootmusic_active', nick);
   document.getElementById('loginModal').style.display='none';
   switchTab('crate');
-};
+}
 
-window.logout = function() {
+function logout() {
   if (confirm('Выйти?')) {
     localStorage.removeItem('lootmusic_active'); user = null;
     document.getElementById('loginModal').style.display='flex'; showLogin();
     switchTab('crate');
     document.getElementById('card').innerHTML = '<div class="card-icon">🎁</div><div class="card-title">??? ????</div><div class="card-artist">Unknown</div><span class="rarity-badge rarity-common">???</span>';
-    document.getElementById('raritySelector').style.display='none';
-    currentTrack = null;
+    document.getElementById('raritySelector').style.display='none'; currentTrack = null;
   }
-};
+}
 
-window.switchTab = function(tab) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', false));
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => { if (t.textContent.includes(tab==='crate'?'Кейс':tab==='collection'?'Коллекция':tab==='trade'?'Обмен':tab==='chat'?'Чат':'👤')) t.classList.add('active'); });
   ['crate','collection','trade','chat','profile'].forEach(t => document.getElementById('tab-'+t).style.display = t===tab?'block':'none');
   if (tab==='collection') renderCollection();
   if (tab==='profile') { document.getElementById('profileName').textContent=user?.nick||'-'; document.getElementById('profileCount').textContent=(user?.collection?.length||0)+' треков'; document.getElementById('profilePoints').textContent='⭐ '+(user?.points||0); }
-  if (tab==='trade') { loadActiveTrades(); }
+  if (tab==='trade') loadActiveTrades();
   updateTimer();
-};
+}
 
-window.toggleDropdown = function() { if (currentTrack && !currentTrack.rarityLocked) document.getElementById('dropdownMenu').classList.toggle('show'); };
+function toggleDropdown() { if (currentTrack && !currentTrack.rarityLocked) document.getElementById('dropdownMenu').classList.toggle('show'); }
 
-window.openCrate = function() {
+function openCrate() {
   if (!user) return alert('Войди!');
   if (!canOpen()) return;
   document.getElementById('openBtn').disabled = true;
@@ -297,9 +295,9 @@ window.openCrate = function() {
     document.getElementById('player').innerHTML = '<audio controls autoplay><source src="'+currentTrack.audio+'" type="audio/mpeg"></audio>';
     updateTimer();
   },800);
-};
+}
 
-window.setRarity = function(rarity,cost) {
+function setRarity(rarity,cost) {
   if (!currentTrack||currentTrack.rarityLocked) return;
   if (user.points < cost) return alert('Мало очков!');
   user.points-=cost; currentTrack.rarity=rarity; currentTrack.rarityLocked=true;
@@ -308,9 +306,9 @@ window.setRarity = function(rarity,cost) {
   saveUser(); updateCard(currentTrack);
   document.getElementById('raritySelector').style.display='none';
   document.getElementById('dropdownMenu').classList.remove('show');
-};
+}
 
-window.searchMyTracks = function(inputId, suggestId) {
+function searchMyTracks(inputId, suggestId) {
   const val = document.getElementById(inputId).value.toLowerCase();
   const s = document.getElementById(suggestId);
   if (!val) { s.style.display='none'; return; }
@@ -318,9 +316,9 @@ window.searchMyTracks = function(inputId, suggestId) {
   if (!matches.length) { s.style.display='none'; return; }
   s.innerHTML = matches.map(t => '<div class="suggest-item" onclick="selectTrack(\''+inputId+'\',\''+suggestId+'\',\''+t.uid+'\')">'+t.icon+' '+t.title+' - '+t.artist+' <span style=opacity:0.5>'+t.rarity+'</span></div>').join('');
   s.style.display='block';
-};
+}
 
-window.searchPlayers = function(inputId, suggestId) {
+function searchPlayers(inputId, suggestId) {
   const val = document.getElementById(inputId).value.toLowerCase();
   const s = document.getElementById(suggestId);
   if (!val) { s.style.display='none'; return; }
@@ -328,19 +326,12 @@ window.searchPlayers = function(inputId, suggestId) {
   if (!matches.length) { s.style.display='none'; return; }
   s.innerHTML = matches.map(n => '<div class="suggest-item" onclick="selectPlayer(\''+inputId+'\',\''+suggestId+'\',\''+n+'\')">👤 '+n+'</div>').join('');
   s.style.display='block';
-};
+}
 
-window.selectTrack = function(inputId, suggestId, uid) {
-  document.getElementById(inputId).value = uid;
-  document.getElementById(suggestId).style.display = 'none';
-};
+function selectTrack(inputId, suggestId, uid) { document.getElementById(inputId).value = uid; document.getElementById(suggestId).style.display = 'none'; }
+function selectPlayer(inputId, suggestId, nick) { document.getElementById(inputId).value = nick; document.getElementById(suggestId).style.display = 'none'; }
 
-window.selectPlayer = function(inputId, suggestId, nick) {
-  document.getElementById(inputId).value = nick;
-  document.getElementById(suggestId).style.display = 'none';
-};
-
-window.sendGift = async function() {
+async function sendGift() {
   const trackUid = document.getElementById('giftTrackInput').value.trim();
   const targetNick = document.getElementById('giftPlayerInput').value.trim();
   if (!trackUid || !targetNick) return alert('Заполни поля');
@@ -348,14 +339,12 @@ window.sendGift = async function() {
   if (!track) return alert('Трек не найден');
   if (!usersDB[targetNick]) return alert('Игрок не найден');
   try {
-    await addDoc(collection(db, 'gifts'), { from: user.nick, to: targetNick, track, timestamp: Date.now(), status: 'pending' });
+    await db.collection('gifts').add({ from: user.nick, to: targetNick, track, timestamp: Date.now(), status: 'pending' });
     alert('Подарок отправлен!');
-    document.getElementById('giftTrackInput').value = '';
-    document.getElementById('giftPlayerInput').value = '';
-  } catch(e) { alert('Ошибка'); }
-};
+  } catch(e) { alert('Ошибка: '+e.message); }
+}
 
-window.sendTrade = async function() {
+async function sendTrade() {
   const myUid = document.getElementById('myTrackInput').value.trim();
   const theirUid = document.getElementById('theirTrackInput').value.trim();
   const targetNick = document.getElementById('tradePlayerInput').value.trim();
@@ -364,40 +353,28 @@ window.sendTrade = async function() {
   if (!myTrack) return alert('Твой трек не найден');
   if (!usersDB[targetNick]) return alert('Игрок не найден');
   try {
-    await addDoc(collection(db, 'trades'), { from: user.nick, to: targetNick, fromTrack: myTrack, toTrackUid: theirUid, status: 'pending', timestamp: Date.now() });
+    await db.collection('trades').add({ from: user.nick, to: targetNick, fromTrack: myTrack, toTrackUid: theirUid, status: 'pending', timestamp: Date.now() });
     alert('Обмен предложен!');
-    document.getElementById('myTrackInput').value = '';
-    document.getElementById('theirTrackInput').value = '';
-    document.getElementById('tradePlayerInput').value = '';
     loadActiveTrades();
-  } catch(e) { alert('Ошибка'); }
-};
+  } catch(e) { alert('Ошибка: '+e.message); }
+}
 
-window.acceptTrade = async function(tradeId) {
-  try {
-    const tradeRef = doc(db, 'trades', tradeId);
-    await updateDoc(tradeRef, { status: 'accepted' });
-    loadActiveTrades();
-  } catch(e) { alert('Ошибка'); }
-};
+async function acceptTrade(tradeId) {
+  try { await db.collection('trades').doc(tradeId).update({ status: 'accepted' }); loadActiveTrades(); } catch(e) {}
+}
+async function rejectTrade(tradeId) {
+  try { await db.collection('trades').doc(tradeId).update({ status: 'rejected' }); loadActiveTrades(); } catch(e) {}
+}
 
-window.rejectTrade = async function(tradeId) {
-  try {
-    const tradeRef = doc(db, 'trades', tradeId);
-    await updateDoc(tradeRef, { status: 'rejected' });
-    loadActiveTrades();
-  } catch(e) { alert('Ошибка'); }
-};
-
-window.sendChat = function() {
+function sendChat() {
   const input = document.getElementById('chatInput');
   const msg = input.value.trim();
   if (!msg || !user) return;
-  push(ref(rtdb, 'chat'), { nick: user.nick, text: msg, time: Date.now() });
+  rtdb.ref('chat').push({ nick: user.nick, text: msg, time: firebase.database.ServerValue.TIMESTAMP });
   input.value = '';
-};
+}
 
-window.copyID = function(uid) { navigator.clipboard.writeText(uid).then(()=>alert('Скопировано!')); };
+function copyID(uid) { navigator.clipboard.writeText(uid).then(()=>alert('Скопировано!')); }
 
 function canOpen() { if (!user) return false; if (!user.lastOpen) return true; return (Date.now()-new Date(user.lastOpen).getTime()) >= 2*60*60*1000; }
 function timeUntil() {
@@ -433,35 +410,33 @@ async function loadActiveTrades() {
   const container = document.getElementById('activeTrades');
   container.innerHTML = '<div class="empty">Загрузка...</div>';
   try {
-    const q1 = query(collection(db, 'trades'), where('from', '==', user.nick));
-    const q2 = query(collection(db, 'trades'), where('to', '==', user.nick));
-    const s1 = await getDocs(q1); const s2 = await getDocs(q2);
+    const s1 = await db.collection('trades').where('from','==',user.nick).get();
+    const s2 = await db.collection('trades').where('to','==',user.nick).get();
     let html = '';
     s1.forEach(d => { const t = d.data(); html += tradeCard(d.id, t, 'Исходящий'); });
     s2.forEach(d => { const t = d.data(); html += tradeCard(d.id, t, 'Входящий'); });
     container.innerHTML = html || '<div class="empty">Нет активных обменов</div>';
-  } catch(e) { container.innerHTML = '<div class="empty">Ошибка загрузки</div>'; }
+  } catch(e) { container.innerHTML = '<div class="empty">Ошибка</div>'; }
 }
 
 function tradeCard(id, t, dir) {
   return '<div class="trade-card"><div>'+dir+': '+t.fromTrack.title+' ↔ '+t.toTrackUid+'<br><small>с '+ (dir==='Входящий'?t.from:t.to) +'</small></div><div><span class="status status-'+t.status+'">'+t.status+'</span>'+(t.status==='pending'&&dir==='Входящий'?' <button class="btn btn-small" onclick="acceptTrade(\''+id+'\')">✅</button> <button class="btn btn-small" onclick="rejectTrade(\''+id+'\')">❌</button>':'')+'</div></div>';
 }
 
-// Чат
-onChildAdded(ref(rtdb, 'chat'), (snap) => {
+// Chat listener
+rtdb.ref('chat').on('child_added', (snap) => {
   const msg = snap.val();
   const box = document.getElementById('chatBox');
-  box.innerHTML += '<div class="chat-msg"><span class="nick">'+msg.nick+'</span> <span class="time">'+new Date(msg.time).toLocaleTimeString().slice(0,5)+'</span><br>'+msg.text+'</div>';
+  const time = msg.time ? new Date(msg.time).toLocaleTimeString().slice(0,5) : '';
+  box.innerHTML += '<div class="chat-msg"><span class="nick">'+msg.nick+'</span> <span class="time">'+time+'</span><br>'+msg.text+'</div>';
   box.scrollTop = box.scrollHeight;
 });
 
-// Закрытие дропдаунов
 document.addEventListener('click', function(e) {
   if (!e.target.closest('.rarity-dropdown')) document.getElementById('dropdownMenu').classList.remove('show');
   if (!e.target.closest('#giftTrackInput') && !e.target.closest('#giftSuggest')) document.getElementById('giftSuggest').style.display='none';
   if (!e.target.closest('#giftPlayerInput') && !e.target.closest('#giftPlayerSuggest')) document.getElementById('giftPlayerSuggest').style.display='none';
   if (!e.target.closest('#myTrackInput') && !e.target.closest('#myTrackSuggest')) document.getElementById('myTrackSuggest').style.display='none';
-  if (!e.target.closest('#theirTrackInput') && !e.target.closest('#theirTrackSuggest')) document.getElementById('theirTrackSuggest').style.display='none';
   if (!e.target.closest('#tradePlayerInput') && !e.target.closest('#tradePlayerSuggest')) document.getElementById('tradePlayerSuggest').style.display='none';
 });
 
@@ -470,7 +445,7 @@ loadUsersDB(); loadUser();
 if (localStorage.getItem('lootmusic_theme')==='dark') { isDark=true; document.getElementById('body').classList.add('dark'); document.querySelector('.theme-btn').textContent='☀️'; }
 if (!user) { document.getElementById('loginModal').style.display='flex'; document.getElementById('openBtn').disabled=true; }
 else { document.getElementById('loginModal').style.display='none'; }
-window.switchTab('crate');
+switchTab('crate');
 setInterval(updateTimer, 1000);
 </script>
 </body>
