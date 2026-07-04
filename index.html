@@ -200,12 +200,9 @@ const firebaseConfig = {
   storageBucket: "lootmusic-e6049.firebasestorage.app",
   messagingSenderId: "459404858144",
   appId: "1:459404858144:web:d6977fa33535a7cb467d45",
-databaseURL: "https://lootmusic-e6049-default-rtdb.firebaseio.com/"
+  databaseURL: "https://lootmusic-e6049-default-rtdb.europe-west1.firebasedatabase.app"
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const rtdb = firebase.database();
-
+  
 const tracks = [
   { id:1, title:"Аппетит", artist:"Дайте танк (!)", icon:"🍽️", audio:"https://ru-d3.drivemusic.me/dl/yX8JSuNNpn_vvB3eP0PwNg/1783219830/download_music/2024/07/dajjte-tank-appetit.mp3" },
   { id:2, title:"Братик, выдыхай", artist:"Антон Небо", icon:"🌬️", audio:"https://ru-d3.drivemusic.me/dl/eQKgtyNjGVUB1kijrwMiMA/1783219954/download_music/2026/01/anton-nebo-bratik-vydykhajj.mp3" },
