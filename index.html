@@ -7,136 +7,62 @@
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
-  background: #ffffff;
-  color: #1a1a1a;
-  font-family: 'Segoe UI', sans-serif;
-  min-height: 100vh;
-  transition: background 0.4s, color 0.4s;
+  background: #ffffff; color: #1a1a1a; font-family: 'Segoe UI', sans-serif;
+  min-height: 100vh; transition: background 0.4s, color 0.4s;
 }
-body.dark {
-  background: #0d0d0d;
-  color: #e0e0e0;
-}
-.app {
-  text-align: center;
-  padding: 20px;
-  max-width: 420px;
-  width: 100%;
-  min-height: 100vh;
-  margin: 0 auto;
-}
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  padding-top: 10px;
-}
-.logo {
-  font-size: 26px;
-  font-weight: 900;
-  letter-spacing: 2px;
-  color: #4a90d9;
-}
+body.dark { background: #0d0d0d; color: #e0e0e0; }
+.app { text-align: center; padding: 20px; max-width: 420px; width: 100%; min-height: 100vh; margin: 0 auto; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-top: 10px; }
+.logo { font-size: 26px; font-weight: 900; letter-spacing: 2px; color: #4a90d9; }
 body.dark .logo { color: #2ecc71; }
 .theme-btn {
-  background: #f0f4f8;
-  border: 2px solid #4a90d9;
-  color: #1a1a1a;
-  font-size: 22px;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: 0.3s;
+  background: #f0f4f8; border: 2px solid #4a90d9; color: #1a1a1a;
+  font-size: 22px; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; transition: 0.3s;
 }
-body.dark .theme-btn {
-  background: #1a1a1a;
-  border-color: #2ecc71;
-  color: #e0e0e0;
-}
-.tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.tab {
-  background: #e8ecf1;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 25px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
-  transition: 0.3s;
-  color: #1a1a1a;
-}
+body.dark .theme-btn { background: #1a1a1a; border-color: #2ecc71; color: #e0e0e0; }
+.tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+.tab { background: #e8ecf1; border: none; padding: 10px 18px; border-radius: 25px; cursor: pointer; font-weight: 600; font-size: 14px; transition: 0.3s; color: #1a1a1a; }
 body.dark .tab { background: #1e1e1e; color: #ccc; }
 .tab.active { background: #4a90d9; color: #fff; }
 body.dark .tab.active { background: #2ecc71; color: #000; }
 .card {
-  background: #f0f4f8;
-  border: 3px solid #888;
-  border-radius: 20px;
-  padding: 30px;
-  margin-bottom: 15px;
-  min-height: 180px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  background: #f0f4f8; border: 3px solid #888; border-radius: 20px; padding: 25px; margin-bottom: 12px;
+  min-height: 160px; display: flex; flex-direction: column; justify-content: center; align-items: center;
   transition: border-color 0.5s, background 0.4s;
 }
 body.dark .card { background: #1a1a1a; }
 .card.rare { border-color: #4a90d9; box-shadow: 0 0 20px rgba(74,144,217,0.3); }
 .card.epic { border-color: #9b59b6; box-shadow: 0 0 25px rgba(155,89,182,0.4); }
 .card.legendary { border-color: #f1c40f; box-shadow: 0 0 30px rgba(241,196,15,0.5); }
-.card-icon { font-size: 60px; margin-bottom: 12px; }
-.card-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-.card-artist { font-size: 15px; opacity: 0.7; margin-bottom: 10px; }
-.rarity-badge {
-  display: inline-block;
-  padding: 4px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
+.card-icon { font-size: 55px; margin-bottom: 10px; }
+.card-title { font-size: 19px; font-weight: 700; margin-bottom: 3px; }
+.card-artist { font-size: 14px; opacity: 0.7; margin-bottom: 8px; }
+.rarity-badge { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
 .rarity-common { background: #888; color: #fff; }
 .rarity-rare { background: #4a90d9; color: #fff; }
 .rarity-epic { background: #9b59b6; color: #fff; }
 .rarity-legendary { background: #f1c40f; color: #000; }
 .btn {
-  background: #4a90d9;
-  color: #ffffff;
-  border: none;
-  padding: 14px 30px;
-  font-size: 16px;
-  font-weight: 700;
-  border-radius: 50px;
-  cursor: pointer;
-  letter-spacing: 1px;
-  transition: 0.3s;
-  width: 100%;
-  margin-bottom: 8px;
+  background: #4a90d9; color: #fff; border: none; padding: 12px 24px; font-size: 15px;
+  font-weight: 700; border-radius: 50px; cursor: pointer; letter-spacing: 1px; transition: 0.3s; width: 100%; margin-bottom: 6px;
 }
 body.dark .btn { background: #1a3d2c; color: #ccffcc; }
 .btn:disabled { opacity: 0.4; cursor: not-allowed; filter: none; transform: none; }
 .btn:hover:not(:disabled) { transform: scale(1.02); filter: brightness(1.15); }
-.timer { font-size: 13px; opacity: 0.7; margin-bottom: 15px; }
+.btn-small { font-size: 12px; padding: 8px 16px; width: auto; margin: 3px; border-radius: 20px; }
+.rarity-btns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+.btn-rarity { font-size: 11px; padding: 6px 12px; border-radius: 15px; width: auto; cursor: pointer; border: 2px solid transparent; font-weight: 700; transition: 0.2s; }
+.btn-rarity.common { background: #888; color: #fff; border-color: #888; }
+.btn-rarity.rare { background: #4a90d9; color: #fff; border-color: #4a90d9; }
+.btn-rarity.epic { background: #9b59b6; color: #fff; border-color: #9b59b6; }
+.btn-rarity.legendary { background: #f1c40f; color: #000; border-color: #f1c40f; }
+.btn-rarity:disabled { opacity: 0.3; cursor: not-allowed; }
+.btn-rarity:hover:not(:disabled) { filter: brightness(1.3); transform: scale(1.05); }
+.timer { font-size: 13px; opacity: 0.7; margin-bottom: 12px; }
+.points { font-size: 13px; font-weight: 700; margin-bottom: 4px; color: #f1c40f; }
 .collection-item {
-  background: #f0f4f8;
-  border-radius: 14px;
-  padding: 14px;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  text-align: left;
-  transition: background 0.3s;
+  background: #f0f4f8; border-radius: 14px; padding: 14px; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 12px; text-align: left; transition: background 0.3s;
 }
 body.dark .collection-item { background: #1a1a1a; }
 .collection-icon { font-size: 36px; }
@@ -146,24 +72,24 @@ body.dark .collection-item { background: #1a1a1a; }
 .collection-date { font-size: 11px; opacity: 0.4; margin-top: 2px; }
 .modal {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.7); display: flex; justify-content: center;
-  align-items: center; z-index: 100;
+  background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 100;
 }
 .modal-box {
-  background: #fff; border-radius: 20px; padding: 30px;
-  text-align: center; max-width: 340px; width: 90%;
+  background: #fff; border-radius: 20px; padding: 30px; text-align: center; max-width: 340px; width: 90%;
 }
 body.dark .modal-box { background: #1e1e1e; }
 .modal-box input {
   width: 100%; padding: 12px 18px; border-radius: 30px;
-  border: 2px solid #4a90d9; font-size: 16px; margin: 15px 0;
-  outline: none; text-align: center;
+  border: 2px solid #4a90d9; font-size: 16px; margin: 10px 0; outline: none; text-align: center;
 }
-body.dark .modal-box input {
-  background: #2a2a2a; border-color: #2ecc71; color: #fff;
-}
+body.dark .modal-box input { background: #2a2a2a; border-color: #2ecc71; color: #fff; }
+.modal-box h2 { margin-bottom: 5px; }
+.modal-box p { font-size: 13px; opacity: 0.7; margin-bottom: 5px; }
+.modal-link { color: #4a90d9; cursor: pointer; font-size: 14px; text-decoration: underline; margin-top: 10px; display: inline-block; }
 .empty { opacity: 0.5; padding: 40px; }
 audio { width: 100%; margin-top: 10px; border-radius: 8px; }
+.error-msg { color: #e74c3c; font-size: 13px; margin-top: 5px; display: none; }
+.locked { opacity: 0.3; pointer-events: none; }
 </style>
 </head>
 <body id="body">
@@ -188,6 +114,15 @@ audio { width: 100%; margin-top: 10px; border-radius: 8px; }
     </div>
     <button class="btn" id="openBtn" onclick="openCrate()">🔓 Открыть кейс</button>
     <div class="timer" id="timer"></div>
+    <div id="raritySelector" style="display:none;">
+      <div class="points" id="pointsDisplay"></div>
+      <div class="rarity-btns">
+        <button class="btn-rarity common" onclick="setRarity('common',0)">Common (0)</button>
+        <button class="btn-rarity rare" onclick="setRarity('rare',1)">Rare (1⭐)</button>
+        <button class="btn-rarity epic" onclick="setRarity('epic',3)">Epic (3⭐)</button>
+        <button class="btn-rarity legendary" onclick="setRarity('legendary',5)">Legendary (5⭐)</button>
+      </div>
+    </div>
     <div id="player"></div>
   </div>
 
@@ -201,37 +136,50 @@ audio { width: 100%; margin-top: 10px; border-radius: 8px; }
       <div class="card-title" id="profileName">-</div>
       <div class="card-artist">Коллекционер</div>
       <span class="rarity-badge rarity-common" id="profileCount">0 треков</span>
+      <div class="points" style="margin-top:10px;" id="profilePoints"></div>
     </div>
     <button class="btn" onclick="logout()">🚪 Выйти</button>
   </div>
 </div>
 
 <div id="loginModal" class="modal">
-  <div class="modal-box">
-    <h2>🎵 Добро пожаловать</h2>
-    <p>Придумай никнейм:</p>
-    <input type="text" id="nickInput" placeholder="Например: MeloManiac" maxlength="20">
+  <div class="modal-box" id="loginBox">
+    <h2>🎵 Вход</h2>
+    <input type="text" id="loginNick" placeholder="Никнейм" maxlength="20">
+    <input type="password" id="loginPass" placeholder="Пароль" maxlength="30">
+    <div class="error-msg" id="loginError">Неверный никнейм или пароль</div>
     <button class="btn" onclick="login()" style="width:auto;padding:12px 30px;">Войти</button>
+    <span class="modal-link" onclick="showRegister()">Нет аккаунта? Создать</span>
+  </div>
+  <div class="modal-box" id="registerBox" style="display:none;">
+    <h2>🎵 Регистрация</h2>
+    <input type="text" id="regNick" placeholder="Никнейм" maxlength="20">
+    <input type="password" id="regPass" placeholder="Пароль" maxlength="30">
+    <input type="password" id="regPass2" placeholder="Повтори пароль" maxlength="30">
+    <div class="error-msg" id="regError">Пароли не совпадают</div>
+    <button class="btn" onclick="register()" style="width:auto;padding:12px 30px;">Создать</button>
+    <span class="modal-link" onclick="showLogin()">Уже есть аккаунт? Войти</span>
   </div>
 </div>
 
 <script>
 const tracks = [
-  { id:1, title:"Аппетит", artist:"Дайте танк (!)", rarity:"common", icon:"🍽️", audio:"https://ru-d3.drivemusic.me/dl/yX8JSuNNpn_vvB3eP0PwNg/1783219830/download_music/2024/07/dajjte-tank-appetit.mp3" },
-  { id:2, title:"Братик, выдыхай", artist:"Антон Небо", rarity:"common", icon:"🌬️", audio:"https://ru-d3.drivemusic.me/dl/eQKgtyNjGVUB1kijrwMiMA/1783219954/download_music/2026/01/anton-nebo-bratik-vydykhajj.mp3" },
-  { id:3, title:"Играю в роблокс", artist:"Черный Джек", rarity:"rare", icon:"🎮", audio:"https://ru-d2.drivemusic.me/dl/im9EndZ8xjE5zmO4KLG6Hw/1783219983/download_music/2026/01/chernyjj-dzhek-igraju-v-robloks.mp3" },
-  { id:4, title:"Она похоронена здесь", artist:"Щенки", rarity:"rare", icon:"🪦", audio:"https://ru-d2.drivemusic.me/dl/4UQO0aBj_svn2jwjhwhuXA/1783220126/download_music/2024/11/shhenki-ona-pokhoronena-zdes.mp3" },
-  { id:5, title:"Нихуя", artist:"Щенки", rarity:"epic", icon:"💥", audio:"https://ru-d1.drivemusic.me/dl/Iki0ZEgO79Aexb6UhlbvxA/1783220160/download_music/2026/01/shhenki-nikhuja.mp3" }
+  { id:1, title:"Аппетит", artist:"Дайте танк (!)", icon:"🍽️", audio:"https://ru-d3.drivemusic.me/dl/yX8JSuNNpn_vvB3eP0PwNg/1783219830/download_music/2024/07/dajjte-tank-appetit.mp3" },
+  { id:2, title:"Братик, выдыхай", artist:"Антон Небо", icon:"🌬️", audio:"https://ru-d3.drivemusic.me/dl/eQKgtyNjGVUB1kijrwMiMA/1783219954/download_music/2026/01/anton-nebo-bratik-vydykhajj.mp3" },
+  { id:3, title:"Играю в роблокс", artist:"Черный Джек", icon:"🎮", audio:"https://ru-d2.drivemusic.me/dl/im9EndZ8xjE5zmO4KLG6Hw/1783219983/download_music/2026/01/chernyjj-dzhek-igraju-v-robloks.mp3" },
+  { id:4, title:"Она похоронена здесь", artist:"Щенки", icon:"🪦", audio:"https://ru-d2.drivemusic.me/dl/4UQO0aBj_svn2jwjhwhuXA/1783220126/download_music/2024/11/shhenki-ona-pokhoronena-zdes.mp3" },
+  { id:5, title:"Нихуя", artist:"Щенки", icon:"💥", audio:"https://ru-d1.drivemusic.me/dl/Iki0ZEgO79Aexb6UhlbvxA/1783220160/download_music/2026/01/shhenki-nikhuja.mp3" }
 ];
 
 let user = null;
 let isDark = false;
+let usersDB = {};
+let currentTrack = null;
 
-function saveUser() { localStorage.setItem('lootmusic_user', JSON.stringify(user)); }
-function loadUser() {
-  const raw = localStorage.getItem('lootmusic_user');
-  if (raw) user = JSON.parse(raw);
-}
+function loadUsersDB() { const raw = localStorage.getItem('lootmusic_users'); if (raw) usersDB = JSON.parse(raw); }
+function saveUsersDB() { localStorage.setItem('lootmusic_users', JSON.stringify(usersDB)); }
+function saveUser() { if (user && usersDB[user.nick]) { usersDB[user.nick].data = user; saveUsersDB(); } }
+function loadUser() { const nick = localStorage.getItem('lootmusic_active'); if (nick && usersDB[nick]) user = usersDB[nick].data; }
 
 function toggleTheme() {
   isDark = !isDark;
@@ -240,9 +188,55 @@ function toggleTheme() {
   localStorage.setItem('lootmusic_theme', isDark ? 'dark' : 'light');
 }
 
+function showRegister() { document.getElementById('loginBox').style.display='none'; document.getElementById('registerBox').style.display='block'; document.getElementById('regError').style.display='none'; }
+function showLogin() { document.getElementById('registerBox').style.display='none'; document.getElementById('loginBox').style.display='block'; document.getElementById('loginError').style.display='none'; }
+
+function register() {
+  const nick = document.getElementById('regNick').value.trim();
+  const pass = document.getElementById('regPass').value;
+  const pass2 = document.getElementById('regPass2').value;
+  const err = document.getElementById('regError');
+  if (!nick || !pass) { err.textContent='Заполни все поля'; err.style.display='block'; return; }
+  if (pass !== pass2) { err.textContent='Пароли не совпадают'; err.style.display='block'; return; }
+  if (usersDB[nick]) { err.textContent='Никнейм занят'; err.style.display='block'; return; }
+  usersDB[nick] = { pass, data: { nick, collection: [], lastOpen: null, points: 2 } };
+  saveUsersDB();
+  user = usersDB[nick].data;
+  localStorage.setItem('lootmusic_active', nick);
+  document.getElementById('loginModal').style.display='none';
+  document.getElementById('regNick').value=''; document.getElementById('regPass').value=''; document.getElementById('regPass2').value='';
+  switchTab('crate');
+}
+
+function login() {
+  const nick = document.getElementById('loginNick').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginError');
+  if (!usersDB[nick] || usersDB[nick].pass !== pass) { err.style.display='block'; return; }
+  user = usersDB[nick].data;
+  localStorage.setItem('lootmusic_active', nick);
+  document.getElementById('loginModal').style.display='none';
+  document.getElementById('loginNick').value=''; document.getElementById('loginPass').value='';
+  err.style.display='none';
+  switchTab('crate');
+}
+
+function logout() {
+  if (confirm('Выйти из аккаунта?')) {
+    localStorage.removeItem('lootmusic_active'); user = null;
+    document.getElementById('loginModal').style.display='flex'; showLogin();
+    switchTab('crate');
+    document.getElementById('card').innerHTML = `<div class="card-icon">🎁</div><div class="card-title">??? ????</div><div class="card-artist">Unknown</div><span class="rarity-badge rarity-common">???</span>`;
+    document.getElementById('collectionList').innerHTML = '<div class="empty">Пусто. Открой свой первый кейс!</div>';
+    document.getElementById('player').innerHTML = '';
+    document.getElementById('raritySelector').style.display = 'none';
+    currentTrack = null;
+  }
+}
+
 function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', t.textContent.includes(
-    tab==='crate'?'Кейс':tab==='collection'?'Коллекция':'Профиль')));
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active',
+    t.textContent.includes(tab==='crate'?'Кейс':tab==='collection'?'Коллекция':'Профиль')));
   document.getElementById('tab-crate').style.display = tab==='crate'?'block':'none';
   document.getElementById('tab-collection').style.display = tab==='collection'?'block':'none';
   document.getElementById('tab-profile').style.display = tab==='profile'?'block':'none';
@@ -250,108 +244,101 @@ function switchTab(tab) {
   if (tab === 'profile') {
     document.getElementById('profileName').textContent = user?.nick || '-';
     document.getElementById('profileCount').textContent = (user?.collection?.length||0) + ' треков';
+    document.getElementById('profilePoints').textContent = '⭐ Очков: ' + (user?.points||0);
   }
   updateTimer();
-}
-
-function login() {
-  const nick = document.getElementById('nickInput').value.trim();
-  if (!nick) return alert('Введи никнейм!');
-  user = { nick, collection: [], lastOpen: null };
-  saveUser();
-  document.getElementById('loginModal').style.display = 'none';
-  switchTab('crate');
-}
-
-function logout() {
-  if (confirm('Удалить аккаунт и все данные?')) {
-    localStorage.removeItem('lootmusic_user');
-    user = null;
-    document.getElementById('loginModal').style.display = 'flex';
-    document.getElementById('nickInput').value = '';
-    switchTab('crate');
-    document.getElementById('card').innerHTML = `
-      <div class="card-icon">🎁</div><div class="card-title">??? ????</div>
-      <div class="card-artist">Unknown</div><span class="rarity-badge rarity-common">???</span>`;
-    document.getElementById('collectionList').innerHTML = '<div class="empty">Пусто. Открой свой первый кейс!</div>';
-    document.getElementById('player').innerHTML = '';
-  }
 }
 
 function canOpen() {
   if (!user) return false;
   if (!user.lastOpen) return true;
-  const now = new Date().getTime();
-  const last = new Date(user.lastOpen).getTime();
-  return (now - last) >= 24 * 60 * 60 * 1000;
+  return (new Date().getTime() - new Date(user.lastOpen).getTime()) >= 24*60*60*1000;
 }
 
 function timeUntil() {
   if (!user?.lastOpen) return 'Можно открыть!';
-  const now = new Date().getTime();
-  const last = new Date(user.lastOpen).getTime();
-  const diff = 24*60*60*1000 - (now - last);
+  const diff = 24*60*60*1000 - (new Date().getTime() - new Date(user.lastOpen).getTime());
   if (diff <= 0) return 'Можно открыть!';
-  const h = Math.floor(diff / (1000*60*60));
-  const m = Math.floor((diff % (1000*60*60)) / (1000*60));
-  const s = Math.floor((diff % (1000*60)) / 1000);
+  const h = Math.floor(diff/(1000*60*60));
+  const m = Math.floor((diff%(1000*60*60))/(1000*60));
+  const s = Math.floor((diff%(1000*60))/1000);
   return `Следующий кейс через: ${h}ч ${m}м ${s}с`;
 }
 
 function updateTimer() {
   const timerEl = document.getElementById('timer');
   const btn = document.getElementById('openBtn');
-  if (!user) { timerEl.textContent = ''; btn.disabled = true; return; }
+  if (!user) { timerEl.textContent=''; btn.disabled=true; return; }
   timerEl.textContent = timeUntil();
   btn.disabled = !canOpen();
-  if (!canOpen()) {
-    btn.textContent = '⏳ Кейс уже открыт';
-  } else {
-    btn.textContent = '🔓 Открыть кейс';
-  }
+  btn.textContent = canOpen() ? '🔓 Открыть кейс' : '⏳ Кейс уже открыт';
 }
 
 function openCrate() {
   if (!user) return alert('Сначала войди!');
   if (!canOpen()) return;
-  
   const btn = document.getElementById('openBtn');
   btn.textContent = "⏳ Открываю...";
   btn.disabled = true;
+  document.getElementById('raritySelector').style.display = 'none';
   
   setTimeout(() => {
-    const track = {...tracks[Math.floor(Math.random() * tracks.length)]};
-    track.obtainedAt = new Date().toISOString();
+    currentTrack = {...tracks[Math.floor(Math.random() * tracks.length)]};
+    currentTrack.rarity = 'common';
+    currentTrack.obtainedAt = new Date().toISOString();
+    currentTrack.rarityLocked = false;
     
     user.lastOpen = new Date().toISOString();
-    user.collection.push(track);
+    user.points = (user.points || 0) + 1;
+    user.collection.push(currentTrack);
     saveUser();
     
-    const card = document.getElementById('card');
-    card.className = 'card';
-    if (track.rarity !== 'common') card.classList.add(track.rarity);
-    card.innerHTML = `
-      <div class="card-icon">${track.icon}</div>
-      <div class="card-title">${track.title}</div>
-      <div class="card-artist">${track.artist}</div>
-      <span class="rarity-badge rarity-${track.rarity}">${track.rarity}</span>`;
+    updateCard(currentTrack);
+    document.getElementById('raritySelector').style.display = 'block';
+    document.getElementById('pointsDisplay').textContent = '⭐ Очков: ' + user.points;
     
     document.getElementById('player').innerHTML = `
       <audio controls autoplay>
-        <source src="${track.audio}" type="audio/mpeg">
-        Ваш браузер не поддерживает аудио.
+        <source src="${currentTrack.audio}" type="audio/mpeg">
       </audio>`;
     
     updateTimer();
   }, 800);
 }
 
+function updateCard(track) {
+  const card = document.getElementById('card');
+  card.className = 'card';
+  if (track.rarity !== 'common') card.classList.add(track.rarity);
+  card.innerHTML = `
+    <div class="card-icon">${track.icon}</div>
+    <div class="card-title">${track.title}</div>
+    <div class="card-artist">${track.artist}</div>
+    <span class="rarity-badge rarity-${track.rarity}">${track.rarity}</span>`;
+}
+
+function setRarity(rarity, cost) {
+  if (!currentTrack || currentTrack.rarityLocked) return;
+  if (user.points < cost) return alert('Не хватает очков! Нужно: ' + cost + ', у тебя: ' + user.points);
+  
+  user.points -= cost;
+  currentTrack.rarity = rarity;
+  currentTrack.rarityLocked = true;
+  
+  // Update track in collection
+  const idx = user.collection.findIndex(t => t.obtainedAt === currentTrack.obtainedAt && t.title === currentTrack.title);
+  if (idx >= 0) user.collection[idx] = currentTrack;
+  saveUser();
+  
+  updateCard(currentTrack);
+  document.getElementById('raritySelector').style.display = 'none';
+  document.getElementById('pointsDisplay').textContent = '⭐ Очков: ' + user.points;
+  document.getElementById('player').innerHTML = '';
+}
+
 function renderCollection() {
   const list = document.getElementById('collectionList');
-  if (!user?.collection?.length) {
-    list.innerHTML = '<div class="empty">Пусто. Открой свой первый кейс!</div>';
-    return;
-  }
+  if (!user?.collection?.length) { list.innerHTML = '<div class="empty">Пусто. Открой свой первый кейс!</div>'; return; }
   list.innerHTML = [...user.collection].reverse().map(t => {
     const d = new Date(t.obtainedAt);
     const dateStr = d.toLocaleDateString('ru-RU', {day:'numeric',month:'long',year:'numeric'});
@@ -368,18 +355,10 @@ function renderCollection() {
 }
 
 // Init
-loadUser();
-if (localStorage.getItem('lootmusic_theme') === 'dark') {
-  isDark = true;
-  document.getElementById('body').classList.add('dark');
-  document.querySelector('.theme-btn').textContent = '☀️';
-}
-if (!user) {
-  document.getElementById('loginModal').style.display = 'flex';
-  document.getElementById('openBtn').disabled = true;
-} else {
-  document.getElementById('loginModal').style.display = 'none';
-}
+loadUsersDB(); loadUser();
+if (localStorage.getItem('lootmusic_theme') === 'dark') { isDark=true; document.getElementById('body').classList.add('dark'); document.querySelector('.theme-btn').textContent='☀️'; }
+if (!user) { document.getElementById('loginModal').style.display='flex'; document.getElementById('openBtn').disabled=true; }
+else { document.getElementById('loginModal').style.display='none'; }
 switchTab('crate');
 setInterval(updateTimer, 1000);
 </script>
