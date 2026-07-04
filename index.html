@@ -36,7 +36,8 @@ body.dark .card { background: #1a1a1a; }
 .card.legendary { border-color: #f1c40f; box-shadow: 0 0 30px rgba(241,196,15,0.5); }
 .card-icon { font-size: 55px; margin-bottom: 10px; }
 .card-title { font-size: 19px; font-weight: 700; margin-bottom: 3px; }
-.card-artist { font-size: 14px; opacity: 0.7; margin-bottom: 8px; }
+.card-artist { font-size: 14px; opacity: 0.7; margin-bottom: 4px; }
+.card-id { font-size: 10px; opacity: 0.4; margin-bottom: 6px; font-family: monospace; word-break: break-all; }
 .rarity-badge { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
 .rarity-common { background: #888; color: #fff; }
 .rarity-rare { background: #4a90d9; color: #fff; }
@@ -50,13 +51,10 @@ body.dark .btn { background: #1a3d2c; color: #ccffcc; }
 .btn:disabled { opacity: 0.4; cursor: not-allowed; filter: none; transform: none; }
 .btn:hover:not(:disabled) { transform: scale(1.02); filter: brightness(1.15); }
 .timer { font-size: 13px; opacity: 0.7; margin-bottom: 12px; }
-.rarity-dropdown {
-  position: relative; display: inline-block; margin-top: 8px;
-}
+.rarity-dropdown { position: relative; display: inline-block; margin-top: 8px; }
 .rarity-dropdown-btn {
   background: #888; color: #fff; border: none; padding: 8px 18px; border-radius: 20px;
-  font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
-  transition: 0.3s;
+  font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: 0.3s;
 }
 .rarity-dropdown-btn:hover { filter: brightness(1.2); }
 .rarity-dropdown-menu {
@@ -80,7 +78,7 @@ body.dark .rarity-option:hover { background: #3a3a3a; }
 .points { font-size: 12px; font-weight: 700; color: #f1c40f; margin-bottom: 4px; }
 .collection-item {
   background: #f0f4f8; border-radius: 14px; padding: 14px; margin-bottom: 10px;
-  display: flex; align-items: center; gap: 12px; text-align: left; transition: background 0.3s;
+  display: flex; align-items: center; gap: 12px; text-align: left; transition: background 0.3s; position: relative;
 }
 body.dark .collection-item { background: #1a1a1a; }
 .collection-icon { font-size: 36px; }
@@ -88,6 +86,7 @@ body.dark .collection-item { background: #1a1a1a; }
 .collection-title { font-weight: 700; font-size: 15px; }
 .collection-artist { font-size: 13px; opacity: 0.6; }
 .collection-date { font-size: 11px; opacity: 0.4; margin-top: 2px; }
+.collection-id { font-size: 9px; opacity: 0.3; font-family: monospace; margin-top: 2px; word-break: break-all; }
 .modal {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 100;
@@ -107,6 +106,12 @@ body.dark .modal-box input { background: #2a2a2a; border-color: #2ecc71; color: 
 .empty { opacity: 0.5; padding: 40px; }
 audio { width: 100%; margin-top: 10px; border-radius: 8px; }
 .error-msg { color: #e74c3c; font-size: 13px; margin-top: 5px; display: none; }
+.copy-btn {
+  background: none; border: none; cursor: pointer; font-size: 12px; opacity: 0.5;
+  padding: 2px 6px; border-radius: 8px; transition: 0.2s;
+}
+.copy-btn:hover { opacity: 1; background: rgba(0,0,0,0.1); }
+body.dark .copy-btn:hover { background: rgba(255,255,255,0.1); }
 </style>
 </head>
 <body id="body">
@@ -196,6 +201,10 @@ let isDark = false;
 let usersDB = {};
 let currentTrack = null;
 
+function generateUID(nick) {
+  return nick + '-' + Date.now() + '-' + Math.random().toString(36).substring(2, 8);
+}
+
 function loadUsersDB() { const raw = localStorage.getItem('lootmusic_users'); if (raw) usersDB = JSON.parse(raw); }
 function saveUsersDB() { localStorage.setItem('lootmusic_users', JSON.stringify(usersDB)); }
 function saveUser() { if (user && usersDB[user.nick]) { usersDB[user.nick].data = user; saveUsersDB(); } }
@@ -272,12 +281,12 @@ function switchTab(tab) {
 function canOpen() {
   if (!user) return false;
   if (!user.lastOpen) return true;
-  return (new Date().getTime() - new Date(user.lastOpen).getTime()) >= 24*60*60*1000;
+  return (new Date().getTime() - new Date(user.lastOpen).getTime()) >= 2 * 60 * 60 * 1000;
 }
 
 function timeUntil() {
   if (!user?.lastOpen) return 'Можно открыть!';
-  const diff = 24*60*60*1000 - (new Date().getTime() - new Date(user.lastOpen).getTime());
+  const diff = 2*60*60*1000 - (new Date().getTime() - new Date(user.lastOpen).getTime());
   if (diff <= 0) return 'Можно открыть!';
   const h = Math.floor(diff/(1000*60*60));
   const m = Math.floor((diff%(1000*60*60))/(1000*60));
@@ -310,6 +319,7 @@ function openCrate() {
   
   setTimeout(() => {
     currentTrack = {...tracks[Math.floor(Math.random() * tracks.length)]};
+    currentTrack.uid = generateUID(user.nick);
     currentTrack.rarity = 'common';
     currentTrack.obtainedAt = new Date().toISOString();
     currentTrack.rarityLocked = false;
@@ -341,7 +351,8 @@ function updateCard(track) {
     <div class="card-icon">${track.icon}</div>
     <div class="card-title">${track.title}</div>
     <div class="card-artist">${track.artist}</div>
-    <span class="rarity-badge rarity-${track.rarity}">${track.rarity}</span>`;
+    <span class="rarity-badge rarity-${track.rarity}">${track.rarity}</span>
+    <div class="card-id">ID: ${track.uid}</div>`;
 }
 
 function setRarity(rarity, cost) {
@@ -352,7 +363,7 @@ function setRarity(rarity, cost) {
   currentTrack.rarity = rarity;
   currentTrack.rarityLocked = true;
   
-  const idx = user.collection.findIndex(t => t.obtainedAt === currentTrack.obtainedAt && t.title === currentTrack.title);
+  const idx = user.collection.findIndex(t => t.uid === currentTrack.uid);
   if (idx >= 0) user.collection[idx] = currentTrack;
   saveUser();
   
@@ -360,6 +371,12 @@ function setRarity(rarity, cost) {
   document.getElementById('raritySelector').style.display = 'none';
   document.getElementById('dropdownMenu').classList.remove('show');
   document.getElementById('pointsDisplay').textContent = '⭐ Очков: ' + user.points;
+}
+
+function copyID(uid) {
+  navigator.clipboard.writeText(uid).then(() => {
+    alert('ID скопирован: ' + uid);
+  });
 }
 
 function renderCollection() {
@@ -374,6 +391,7 @@ function renderCollection() {
         <div class="collection-title">${t.title}</div>
         <div class="collection-artist">${t.artist}</div>
         <div class="collection-date">${dateStr}</div>
+        <div class="collection-id">ID: ${t.uid} <button class="copy-btn" onclick="copyID('${t.uid}')" title="Копировать ID">📋</button></div>
       </div>
       <span class="rarity-badge rarity-${t.rarity}">${t.rarity}</span>
     </div>`;
