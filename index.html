@@ -3,7 +3,17 @@ window.onload=function(){
 firebase.initializeApp({apiKey:"AIzaSyAoAsjA5FHfQ7WglssP9_c6MV6mi_CL0Sw",authDomain:"lootmusic-e6049.firebaseapp.com",projectId:"lootmusic-e6049",storageBucket:"lootmusic-e6049.firebasestorage.app",messagingSenderId:"459404858144",appId:"1:459404858144:web:d6977fa33535a7cb467d45",databaseURL:"https://lootmusic-e6049-default-rtdb.europe-west1.firebasedatabase.app"});
 const db=firebase.firestore(),rtdb=firebase.database();
 const ADMIN={uid:"435498",nick:"LOOTMUSIC",pass:"901901OOIBLOOBLOO__"};
-const tracks=[{title:"Аппетит",artist:"Дайте танк (!)",icon:"🍽️",audio:"https://ru-d3.drivemusic.me/dl/yX8JSuNNpn_vvB3eP0PwNg/1783219830/download_music/2024/07/dajjte-tank-appetit.mp3"},{title:"Братик, выдыхай",artist:"Антон Небо",icon:"🌬️",audio:"https://ru-d3.drivemusic.me/dl/eQKgtyNjGVUB1kijrwMiMA/1783219954/download_music/2026/01/anton-nebo-bratik-vydykhajj.mp3"},{title:"Играю в роблокс",artist:"Черный Джек",icon:"🎮",audio:"https://ru-d2.drivemusic.me/dl/im9EndZ8xjE5zmO4KLG6Hw/1783219983/download_music/2026/01/chernyjj-dzhek-igraju-v-robloks.mp3"},{title:"Она похоронена здесь",artist:"Щенки",icon:"🪦",audio:"https://ru-d2.drivemusic.me/dl/4UQO0aBj_svn2jwjhwhuXA/1783220126/download_music/2024/11/shhenki-ona-pokhoronena-zdes.mp3"},{title:"Нихуя",artist:"Щенки",icon:"💥",audio:"https://ru-d1.drivemusic.me/dl/Iki0ZEgO79Aexb6UhlbvxA/1783220160/download_music/2026/01/shhenki-nikhuja.mp3"}];
+const tracks=[
+{title:"Как Mommy",artist:"INSTASAMKA",icon:"💅",audio:"https://cdn20.deliciousoranges.com/s1/get/music/20221217/INSTASAMKA_-_KAK_MOMMY_75305573.mp3"},
+{title:"Лесник",artist:"Король и Шут",icon:"🏰",audio:"https://cdn6.deliciousoranges.com/s3/get/music/20190305/Korol_i_SHut_-_Lesnik_62571704.mp3"},
+{title:"LABUBU",artist:"YUNG FIMOZ MIGAS",icon:"🧸",audio:"https://cdn20.deliciousoranges.com/s1/get/music/20250927/YUNG_FIMOZ_MIGAS_-_LABUBU_79871840.mp3"},
+{title:"Можно я с тобой",artist:"APENT",icon:"💕",audio:"https://cdn2.deliciousoranges.com/s1/get/music/20240309/APENT_-_Mozhno_ya_s_tobojj_77552797.mp3"},
+{title:"Отограф",artist:"Электрофорез суперкомфорт",icon:"📸",audio:"https://cdn11.deliciousoranges.com/s3/get/music/20220617/JElektroforez_superkomfort_-_otograf_74500896.mp3"},
+{title:"НН",artist:"ЩЕНКИ",icon:"🐕",audio:"https://s1.deliciouspeaches.com/get/music/20210226/SHHENKI_-_NN_72787621.mp3"},
+{title:"Эшафот",artist:"Электрофорез",icon:"⚡",audio:"https://cdn19.deliciousoranges.com/s3/get/music/20170830/JElektroforez_-_JEshafot_47845697.mp3"},
+{title:"Мир обречён",artist:"ЩЕНКИ",icon:"🌍",audio:"https://cdn12.deliciousoranges.com/s3/get/music/20230318/SHHENKI_-_Mir_obrechjon_75628142.mp3"},
+{title:"РОССИЯ МАМА",artist:"Shaman",icon:"🇷🇺",audio:"https://cdn17.deliciousoranges.com/s1/get/music/20260530/Shaman_-_ROSSIYA_MAMA_81586232.mp3"}
+];
 let user=null,isDark=false,currentTrack=null,dmPartner=null,adminDMTarget=null;
 const DAY=86400000,TRADE_TIMEOUT_ONLINE=10000,TRADE_TIMEOUT_OFFLINE=600000,MUTE_DURATION=86400000,SPAM_LIMIT=5,SPAM_WINDOW=10000,NEWBIE_GIFT_BAN=86400000,REMOVED_SHOW=10000;
 let messageTimestamps=[];
