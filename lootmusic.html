@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LootMusic</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #ffffff;
+  color: #1a1a1a;
+  font-family: 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  transition: background 0.4s, color 0.4s;
+}
+body.dark {
+  background: #0d0d0d;
+  color: #e0e0e0;
+}
+.app {
+  text-align: center;
+  padding: 20px;
+  max-width: 420px;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0 auto;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-top: 10px;
+}
+.logo {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #4a90d9;
+}
+body.dark .logo { color: #2ecc71; }
+.theme-btn {
+  background: #f0f4f8;
+  border: 2px solid #4a90d9;
+  color: #1a1a1a;
+  font-size: 22px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.3s;
+}
+body.dark .theme-btn {
+  background: #1a1a1a;
+  border-color: #2ecc71;
+  color: #e0e0e0;
+}
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.tab {
+  background: #e8ecf1;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: 0.3s;
+  color: #1a1a1a;
+}
+body.dark .tab {
+  background: #1e1e1e;
+  color: #ccc;
+}
+.tab.active {
+  background: #4a90d9;
+  color: #fff;
+}
+body.dark .tab.active {
+  background: #2ecc71;
+  color: #000;
+}
+.card {
+  background: #f0f4f8;
+  border: 3px solid #888;
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 15px;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: border-color 0.5s, background 0.4s;
+}
+body.dark .card { background: #1a1a1a; }
+.card.rare { border-color: #4a90d9; box-shadow: 0 0 20px rgba(74,144,217,0.3); }
+.card.epic { border-color: #9b59b6; box-shadow: 0 0 25px rgba(155,89,182,0.4); }
+.card.legendary { border-color: #f1c40f; box-shadow: 0 0 30px rgba(241,196,15,0.5); }
+.card-icon { font-size: 60px; margin-bottom: 12px; }
+.card-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.card-artist { font-size: 15px; opacity: 0.7; margin-bottom: 10px; }
+.rarity-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.rarity-common { background: #888; color: #fff; }
+.rarity-rare { background: #4a90d9; color: #fff; }
+.rarity-epic { background: #9b59b6; color: #fff; }
+.rarity-legendary { background: #f1c40f; color: #000; }
+.btn {
+  background: #4a90d9;
+  color: #ffffff;
+  border: none;
+  padding: 14px 30px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 50px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: 0.3s;
+  width: 100%;
+  margin-bottom: 8px;
+}
+body.dark .btn { background: #1a3d2c; color: #ccffcc; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; filter: none; transform: none; }
+.btn:hover:not(:disabled) { transform: scale(1.02); filter: brightness(1.15); }
+.timer { font-size: 13px; opacity: 0.7; margin-bottom: 15px; }
+.collection-item {
+  background: #f0f4f8;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  transition: background 0.3s;
+}
+body.dark .collection-item { background: #1a1a1a; }
+.collection-icon { font-size: 36px; }
+.collection-info { flex: 1; }
+.collection-title { font-weight: 700; font-size: 15px; }
+.collection-artist { font-size: 13px; opacity: 0.6; }
+.collection-date { font-size: 11px; opacity: 0.4; margin-top: 2px; }
+.modal {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.7); display: flex; justify-content: center;
+  align-items: center; z-index: 100;
+}
+.modal-box {
+  background: #fff; border-radius: 20px; padding: 30px;
+  text-align: center; max-width: 340px; width: 90%;
+}
+body.dark .modal-box { background: #1e1e1e; }
+.modal-box input {
+  width: 100%; padding: 12px 18px; border-radius: 30px;
+  border: 2px solid #4a90d9; font-size: 16px; margin: 15px 0;
+  outline: none; text-align: center;
+}
+body.dark .modal-box input {
+  background: #2a2a2a; border-color: #2ecc71; color: #fff;
+}
+.empty { opacity: 0.5; padding: 40px; }
+</style>
+</head>
+<body id="body">
+<div class="app">
+  <div class="header">
+    <div class="logo">LOOTMUSIC</div>
+    <button class="theme-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('crate')">🎁 Кейс</button>
+    <button class="tab" onclick="switchTab('collection')">📦 Коллекция</button>
+    <button class="tab" onclick="switchTab('profile')">👤 Профиль</button>
+  </div>
+
+  <div id="tab-crate">
+    <div class="card" id="card">
+      <div class="card-icon">🎁</div>
+      <div class="card-title">??? ????</div>
+      <div class="card-artist">Unknown</div>
+      <span class="rarity-badge rarity-common">???</span>
+    </div>
+    <button class="btn" id="openBtn" onclick="openCrate()">🔓 Открыть кейс</button>
+    <div class="timer" id="timer"></div>
+  </div>
+
+  <div id="tab-collection" style="display:none;">
+    <div id="collectionList"><div class="empty">Пусто. Открой свой первый кейс!</div></div>
+  </div>
+
+  <div id="tab-profile" style="display:none;">
+    <div class="card">
+      <div class="card-icon">👤</div>
+      <div class="card-title" id="profileName">-</div>
+      <div class="card-artist">Коллекционер</div>
+      <span class="rarity-badge rarity-common" id="profileCount">0 треков</span>
+    </div>
+    <button class="btn" onclick="logout()">🚪 Выйти</button>
+  </div>
+</div>
+
+<div id="loginModal" class="modal">
+  <div class="modal-box">
+    <h2>🎵 Добро пожаловать</h2>
+    <p>Придумай никнейм:</p>
+    <input type="text" id="nickInput" placeholder="Например: MeloManiac" maxlength="20">
+    <button class="btn" onclick="login()" style="width:auto;padding:12px 30px;">Войти</button>
+  </div>
+</div>
+
+<script>
+const tracks = [
+  { id:1, title:"Neon Horizon", artist:"Synthwave Kid", rarity:"common", icon:"🎵" },
+  { id:2, title:"Midnight Echo", artist:"Luna Wave", rarity:"common", icon:"🎶" },
+  { id:3, title:"Crystal Cave", artist:"Deep Sound", rarity:"rare", icon:"💎" },
+  { id:4, title:"Storm Chaser", artist:"Volt Age", rarity:"rare", icon:"⚡" },
+  { id:5, title:"Astral Projection", artist:"Unknown Artist", rarity:"epic", icon:"🌌" },
+  { id:6, title:"Echo of Silence", artist:"The Void", rarity:"epic", icon:"🌀" },
+  { id:7, title:"Golden Record", artist:"Voyager", rarity:"legendary", icon:"👑" }
+];
+
+let user = null;
+let isDark = false;
+
+function saveUser() { localStorage.setItem('lootmusic_user', JSON.stringify(user)); }
+function loadUser() {
+  const raw = localStorage.getItem('lootmusic_user');
+  if (raw) user = JSON.parse(raw);
+}
+
+function toggleTheme() {
+  isDark = !isDark;
+  document.getElementById('body').classList.toggle('dark', isDark);
+  document.querySelector('.theme-btn').textContent = isDark ? '☀️' : '🌙';
+  localStorage.setItem('lootmusic_theme', isDark ? 'dark' : 'light');
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', t.textContent.includes(
+    tab==='crate'?'Кейс':tab==='collection'?'Коллекция':'Профиль')));
+  document.getElementById('tab-crate').style.display = tab==='crate'?'block':'none';
+  document.getElementById('tab-collection').style.display = tab==='collection'?'block':'none';
+  document.getElementById('tab-profile').style.display = tab==='profile'?'block':'none';
+  if (tab === 'collection') renderCollection();
+  if (tab === 'profile') {
+    document.getElementById('profileName').textContent = user?.nick || '-';
+    document.getElementById('profileCount').textContent = (user?.collection?.length||0) + ' треков';
+  }
+  updateTimer();
+}
+
+function login() {
+  const nick = document.getElementById('nickInput').value.trim();
+  if (!nick) return alert('Введи никнейм!');
+  user = { nick, collection: [], lastOpen: null };
+  saveUser();
+  document.getElementById('loginModal').style.display = 'none';
+  switchTab('crate');
+}
+
+function logout() {
+  if (confirm('Удалить аккаунт и все данные?')) {
+    localStorage.removeItem('lootmusic_user');
+    user = null;
+    document.getElementById('loginModal').style.display = 'flex';
+    document.getElementById('nickInput').value = '';
+    switchTab('crate');
+    document.getElementById('card').innerHTML = `
+      <div class="card-icon">🎁</div><div class="card-title">??? ????</div>
+      <div class="card-artist">Unknown</div><span class="rarity-badge rarity-common">???</span>`;
+    document.getElementById('collectionList').innerHTML = '<div class="empty">Пусто. Открой свой первый кейс!</div>';
+  }
+}
+
+function canOpen() {
+  if (!user) return false;
+  if (!user.lastOpen) return true;
+  const now = new Date().getTime();
+  const last = new Date(user.lastOpen).getTime();
+  return (now - last) >= 24 * 60 * 60 * 1000;
+}
+
+function timeUntil() {
+  if (!user?.lastOpen) return 'Можно открыть!';
+  const now = new Date().getTime();
+  const last = new Date(user.lastOpen).getTime();
+  const diff = 24*60*60*1000 - (now - last);
+  if (diff <= 0) return 'Можно открыть!';
+  const h = Math.floor(diff / (1000*60*60));
+  const m = Math.floor((diff % (1000*60*60)) / (1000*60));
+  const s = Math.floor((diff % (1000*60)) / 1000);
+  return `Следующий кейс через: ${h}ч ${m}м ${s}с`;
+}
+
+function updateTimer() {
+  const timerEl = document.getElementById('timer');
+  const btn = document.getElementById('openBtn');
+  if (!user) { timerEl.textContent = ''; btn.disabled = true; return; }
+  timerEl.textContent = timeUntil();
+  btn.disabled = !canOpen();
+  if (!canOpen()) {
+    btn.textContent = '⏳ Кейс уже открыт';
+  } else {
+    btn.textContent = '🔓 Открыть кейс';
+  }
+}
+
+function openCrate() {
+  if (!user) return alert('Сначала войди!');
+  if (!canOpen()) return;
+  
+  const btn = document.getElementById('openBtn');
+  btn.textContent = "⏳ Открываю...";
+  btn.disabled = true;
+  
+  setTimeout(() => {
+    const track = {...tracks[Math.floor(Math.random() * tracks.length)]};
+    track.obtainedAt = new Date().toISOString();
+    
+    user.lastOpen = new Date().toISOString();
+    user.collection.push(track);
+    saveUser();
+    
+    const card = document.getElementById('card');
+    card.className = 'card';
+    if (track.rarity !== 'common') card.classList.add(track.rarity);
+    card.innerHTML = `
+      <div class="card-icon">${track.icon}</div>
+      <div class="card-title">${track.title}</div>
+      <div class="card-artist">${track.artist}</div>
+      <span class="rarity-badge rarity-${track.rarity}">${track.rarity}</span>`;
+    
+    updateTimer();
+  }, 800);
+}
+
+function renderCollection() {
+  const list = document.getElementById('collectionList');
+  if (!user?.collection?.length) {
+    list.innerHTML = '<div class="empty">Пусто. Открой свой первый кейс!</div>';
+    return;
+  }
+  list.innerHTML = [...user.collection].reverse().map(t => {
+    const d = new Date(t.obtainedAt);
+    const dateStr = d.toLocaleDateString('ru-RU', {day:'numeric',month:'long',year:'numeric'});
+    return `<div class="collection-item">
+      <div class="collection-icon">${t.icon}</div>
+      <div class="collection-info">
+        <div class="collection-title">${t.title}</div>
+        <div class="collection-artist">${t.artist}</div>
+        <div class="collection-date">${dateStr}</div>
+      </div>
+      <span class="rarity-badge rarity-${t.rarity}">${t.rarity}</span>
+    </div>`;
+  }).join('');
+}
+
+// Init
+loadUser();
+if (localStorage.getItem('lootmusic_theme') === 'dark') {
+  isDark = true;
+  document.getElementById('body').classList.add('dark');
+  document.querySelector('.theme-btn').textContent = '☀️';
+}
+if (!user) {
+  document.getElementById('loginModal').style.display = 'flex';
+  document.getElementById('openBtn').disabled = true;
+} else {
+  document.getElementById('loginModal').style.display = 'none';
+}
+switchTab('crate');
+setInterval(updateTimer, 1000);
+</script>
+</body>
+</html>
