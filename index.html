@@ -75,7 +75,7 @@ body.dark .trade-section { background: #1a1a1a; }
 body.dark .trade-section input { background: #2a2a2a; border-color: #2ecc71; color: #fff; }
 .trade-card { background: #e0e4e8; border-radius: 10px; padding: 8px 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
 body.dark .trade-card { background: #2a2a2a; }
-.trade-card .status { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 10px; }
+.status { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 10px; }
 .status-pending { background: #f1c40f; color: #000; }
 .status-accepted { background: #2ecc71; color: #fff; }
 .status-rejected { background: #e74c3c; color: #fff; }
@@ -117,7 +117,7 @@ body.dark .suggest-item:hover { background: #3a3a3a; }
     <div id="raritySelector" style="display:none;">
       <div class="points" id="pointsDisplay">⭐ 0</div>
       <div class="rarity-dropdown">
-        <button class="rarity-dropdown-btn" id="dropdownBtn" onclick="toggleDropdown()">Редкость ▾</button>
+        <button class="rarity-dropdown-btn" onclick="toggleDropdown()">Редкость ▾</button>
         <div class="rarity-dropdown-menu" id="dropdownMenu">
           <div class="rarity-option common" onclick="setRarity('common',0)">Common (0⭐)</div>
           <div class="rarity-option rare" onclick="setRarity('rare',1)">Rare (1⭐)</div>
@@ -142,10 +142,9 @@ body.dark .suggest-item:hover { background: #3a3a3a; }
     </div>
     <div class="trade-section">
       <h3>🔄 Предложить обмен</h3>
-      <input type="text" id="myTrackInput" placeholder="Мой трек (название/ID)..." oninput="searchMyTracks('myTrackInput','myTrackSuggest')">
+      <input type="text" id="myTrackInput" placeholder="Мой трек..." oninput="searchMyTracks('myTrackInput','myTrackSuggest')">
       <div class="suggestions" id="myTrackSuggest" style="display:none;"></div>
-      <input type="text" id="theirTrackInput" placeholder="Трек игрока (название/ID)..." oninput="searchTheirTracks('theirTrackInput','theirTrackSuggest')">
-      <div class="suggestions" id="theirTrackSuggest" style="display:none;"></div>
+      <input type="text" id="theirTrackInput" placeholder="Трек игрока (название/ID)...">
       <input type="text" id="tradePlayerInput" placeholder="Никнейм игрока..." oninput="searchPlayers('tradePlayerInput','tradePlayerSuggest')">
       <div class="suggestions" id="tradePlayerSuggest" style="display:none;"></div>
       <button class="btn btn-small" onclick="sendTrade()">🔄 Предложить</button>
@@ -192,8 +191,7 @@ body.dark .suggest-item:hover { background: #3a3a3a; }
 </div>
 
 <script>
-// Firebase Init
-const firebaseConfig = {
+firebase.initializeApp({
   apiKey: "AIzaSyAoAsjA5FHfQ7WglssP9_c6MV6mi_CL0Sw",
   authDomain: "lootmusic-e6049.firebaseapp.com",
   projectId: "lootmusic-e6049",
@@ -201,8 +199,10 @@ const firebaseConfig = {
   messagingSenderId: "459404858144",
   appId: "1:459404858144:web:d6977fa33535a7cb467d45",
   databaseURL: "https://lootmusic-e6049-default-rtdb.europe-west1.firebasedatabase.app"
-};
-  
+});
+const db = firebase.firestore();
+const rtdb = firebase.database();
+
 const tracks = [
   { id:1, title:"Аппетит", artist:"Дайте танк (!)", icon:"🍽️", audio:"https://ru-d3.drivemusic.me/dl/yX8JSuNNpn_vvB3eP0PwNg/1783219830/download_music/2024/07/dajjte-tank-appetit.mp3" },
   { id:2, title:"Братик, выдыхай", artist:"Антон Небо", icon:"🌬️", audio:"https://ru-d3.drivemusic.me/dl/eQKgtyNjGVUB1kijrwMiMA/1783219954/download_music/2026/01/anton-nebo-bratik-vydykhajj.mp3" },
@@ -219,231 +219,175 @@ function saveUser() { if (user && usersDB[user.nick]) { usersDB[user.nick].data 
 function loadUser() { const nick = localStorage.getItem('lootmusic_active'); if (nick && usersDB[nick]) user = usersDB[nick].data; }
 function generateUID(nick) { return nick + '-' + Date.now() + '-' + Math.random().toString(36).substring(2, 8); }
 
-function toggleTheme() {
-  isDark = !isDark;
-  document.getElementById('body').classList.toggle('dark', isDark);
-  document.querySelector('.theme-btn').textContent = isDark ? '☀️' : '🌙';
-  localStorage.setItem('lootmusic_theme', isDark ? 'dark' : 'light');
-}
-
+function toggleTheme() { isDark=!isDark; document.getElementById('body').classList.toggle('dark',isDark); document.querySelector('.theme-btn').textContent=isDark?'☀️':'🌙'; localStorage.setItem('lootmusic_theme',isDark?'dark':'light'); }
 function showRegister() { document.getElementById('loginBox').style.display='none'; document.getElementById('registerBox').style.display='block'; }
 function showLogin() { document.getElementById('registerBox').style.display='none'; document.getElementById('loginBox').style.display='block'; }
 
 function register() {
-  const nick = document.getElementById('regNick').value.trim();
-  const pass = document.getElementById('regPass').value;
-  const pass2 = document.getElementById('regPass2').value;
-  const err = document.getElementById('regError');
-  if (!nick || !pass) { err.textContent='Заполни'; err.style.display='block'; return; }
-  if (pass !== pass2) { err.textContent='Пароли не совпадают'; err.style.display='block'; return; }
-  if (usersDB[nick]) { err.textContent='Занят'; err.style.display='block'; return; }
-  usersDB[nick] = { pass, data: { nick, collection: [], lastOpen: null, points: 2 } };
-  saveUsersDB(); user = usersDB[nick].data;
-  localStorage.setItem('lootmusic_active', nick);
-  document.getElementById('loginModal').style.display='none';
-  switchTab('crate');
+  const nick=document.getElementById('regNick').value.trim(), pass=document.getElementById('regPass').value, pass2=document.getElementById('regPass2').value, err=document.getElementById('regError');
+  if(!nick||!pass){err.textContent='Заполни';err.style.display='block';return}
+  if(pass!==pass2){err.textContent='Пароли не совпадают';err.style.display='block';return}
+  if(usersDB[nick]){err.textContent='Занят';err.style.display='block';return}
+  usersDB[nick]={pass,data:{nick,collection:[],lastOpen:null,points:2}};saveUsersDB();user=usersDB[nick].data;
+  localStorage.setItem('lootmusic_active',nick);document.getElementById('loginModal').style.display='none';switchTab('crate');
 }
 
 function login() {
-  const nick = document.getElementById('loginNick').value.trim();
-  const pass = document.getElementById('loginPass').value;
-  if (!usersDB[nick] || usersDB[nick].pass !== pass) { document.getElementById('loginError').style.display='block'; return; }
-  user = usersDB[nick].data; localStorage.setItem('lootmusic_active', nick);
-  document.getElementById('loginModal').style.display='none';
-  switchTab('crate');
+  const nick=document.getElementById('loginNick').value.trim(), pass=document.getElementById('loginPass').value;
+  if(!usersDB[nick]||usersDB[nick].pass!==pass){document.getElementById('loginError').style.display='block';return}
+  user=usersDB[nick].data;localStorage.setItem('lootmusic_active',nick);document.getElementById('loginModal').style.display='none';switchTab('crate');
 }
 
 function logout() {
-  if (confirm('Выйти?')) {
-    localStorage.removeItem('lootmusic_active'); user = null;
-    document.getElementById('loginModal').style.display='flex'; showLogin();
-    switchTab('crate');
-    document.getElementById('card').innerHTML = '<div class="card-icon">🎁</div><div class="card-title">??? ????</div><div class="card-artist">Unknown</div><span class="rarity-badge rarity-common">???</span>';
-    document.getElementById('raritySelector').style.display='none'; currentTrack = null;
-  }
+  if(confirm('Выйти?')){localStorage.removeItem('lootmusic_active');user=null;document.getElementById('loginModal').style.display='flex';showLogin();switchTab('crate');
+  document.getElementById('card').innerHTML='<div class="card-icon">🎁</div><div class="card-title">??? ????</div><div class="card-artist">Unknown</div><span class="rarity-badge rarity-common">???</span>';
+  document.getElementById('raritySelector').style.display='none';currentTrack=null;}
 }
 
 function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => { if (t.textContent.includes(tab==='crate'?'Кейс':tab==='collection'?'Коллекция':tab==='trade'?'Обмен':tab==='chat'?'Чат':'👤')) t.classList.add('active'); });
-  ['crate','collection','trade','chat','profile'].forEach(t => document.getElementById('tab-'+t).style.display = t===tab?'block':'none');
-  if (tab==='collection') renderCollection();
-  if (tab==='profile') { document.getElementById('profileName').textContent=user?.nick||'-'; document.getElementById('profileCount').textContent=(user?.collection?.length||0)+' треков'; document.getElementById('profilePoints').textContent='⭐ '+(user?.points||0); }
-  if (tab==='trade') loadActiveTrades();
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>{if(t.textContent.includes(tab==='crate'?'Кейс':tab==='collection'?'Коллекция':tab==='trade'?'Обмен':tab==='chat'?'Чат':'👤'))t.classList.add('active')});
+  ['crate','collection','trade','chat','profile'].forEach(t=>document.getElementById('tab-'+t).style.display=t===tab?'block':'none');
+  if(tab==='collection')renderCollection();
+  if(tab==='profile'){document.getElementById('profileName').textContent=user?.nick||'-';document.getElementById('profileCount').textContent=(user?.collection?.length||0)+' треков';document.getElementById('profilePoints').textContent='⭐ '+(user?.points||0)}
+  if(tab==='trade')loadActiveTrades();
   updateTimer();
 }
 
-function toggleDropdown() { if (currentTrack && !currentTrack.rarityLocked) document.getElementById('dropdownMenu').classList.toggle('show'); }
+function toggleDropdown(){if(currentTrack&&!currentTrack.rarityLocked)document.getElementById('dropdownMenu').classList.toggle('show')}
 
 function openCrate() {
-  if (!user) return alert('Войди!');
-  if (!canOpen()) return;
-  document.getElementById('openBtn').disabled = true;
-  document.getElementById('raritySelector').style.display='none';
-  setTimeout(() => {
-    currentTrack = {...tracks[Math.floor(Math.random()*tracks.length)]};
-    currentTrack.uid = generateUID(user.nick);
-    currentTrack.rarity='common'; currentTrack.obtainedAt=new Date().toISOString(); currentTrack.rarityLocked=false;
-    user.lastOpen=new Date().toISOString(); user.points=(user.points||0)+1;
-    user.collection.push(currentTrack); saveUser();
-    updateCard(currentTrack);
-    document.getElementById('raritySelector').style.display='block';
+  if(!user)return alert('Войди!');
+  if(!canOpen())return;
+  document.getElementById('openBtn').disabled=true;document.getElementById('raritySelector').style.display='none';
+  setTimeout(()=>{
+    currentTrack={...tracks[Math.floor(Math.random()*tracks.length)]};
+    currentTrack.uid=generateUID(user.nick);currentTrack.rarity='common';currentTrack.obtainedAt=new Date().toISOString();currentTrack.rarityLocked=false;
+    user.lastOpen=new Date().toISOString();user.points=(user.points||0)+1;user.collection.push(currentTrack);saveUser();
+    updateCard(currentTrack);document.getElementById('raritySelector').style.display='block';
     document.getElementById('pointsDisplay').textContent='⭐ '+user.points;
-    document.getElementById('player').innerHTML = '<audio controls autoplay><source src="'+currentTrack.audio+'" type="audio/mpeg"></audio>';
+    document.getElementById('player').innerHTML='<audio controls autoplay><source src="'+currentTrack.audio+'" type="audio/mpeg"></audio>';
     updateTimer();
   },800);
 }
 
-function setRarity(rarity,cost) {
-  if (!currentTrack||currentTrack.rarityLocked) return;
-  if (user.points < cost) return alert('Мало очков!');
-  user.points-=cost; currentTrack.rarity=rarity; currentTrack.rarityLocked=true;
-  const idx = user.collection.findIndex(t=>t.uid===currentTrack.uid);
-  if (idx>=0) user.collection[idx]=currentTrack;
-  saveUser(); updateCard(currentTrack);
-  document.getElementById('raritySelector').style.display='none';
-  document.getElementById('dropdownMenu').classList.remove('show');
+function setRarity(rarity,cost){
+  if(!currentTrack||currentTrack.rarityLocked)return;
+  if(user.points<cost)return alert('Мало очков!');
+  user.points-=cost;currentTrack.rarity=rarity;currentTrack.rarityLocked=true;
+  const idx=user.collection.findIndex(t=>t.uid===currentTrack.uid);if(idx>=0)user.collection[idx]=currentTrack;
+  saveUser();updateCard(currentTrack);document.getElementById('raritySelector').style.display='none';document.getElementById('dropdownMenu').classList.remove('show');
 }
 
-function searchMyTracks(inputId, suggestId) {
-  const val = document.getElementById(inputId).value.toLowerCase();
-  const s = document.getElementById(suggestId);
-  if (!val) { s.style.display='none'; return; }
-  const matches = (user?.collection||[]).filter(t => t.title.toLowerCase().includes(val) || t.uid.toLowerCase().includes(val) || t.artist.toLowerCase().includes(val));
-  if (!matches.length) { s.style.display='none'; return; }
-  s.innerHTML = matches.map(t => '<div class="suggest-item" onclick="selectTrack(\''+inputId+'\',\''+suggestId+'\',\''+t.uid+'\')">'+t.icon+' '+t.title+' - '+t.artist+' <span style=opacity:0.5>'+t.rarity+'</span></div>').join('');
+function searchMyTracks(inputId,suggestId){
+  const val=document.getElementById(inputId).value.toLowerCase(), s=document.getElementById(suggestId);
+  if(!val){s.style.display='none';return}
+  const matches=(user?.collection||[]).filter(t=>t.title.toLowerCase().includes(val)||t.uid.toLowerCase().includes(val)||t.artist.toLowerCase().includes(val));
+  if(!matches.length){s.style.display='none';return}
+  s.innerHTML=matches.map(t=>'<div class="suggest-item" onclick="selectTrack(\''+inputId+'\',\''+suggestId+'\',\''+t.uid+'\')">'+t.icon+' '+t.title+' <span style=opacity:0.5>'+t.rarity+'</span></div>').join('');
   s.style.display='block';
 }
 
-function searchPlayers(inputId, suggestId) {
-  const val = document.getElementById(inputId).value.toLowerCase();
-  const s = document.getElementById(suggestId);
-  if (!val) { s.style.display='none'; return; }
-  const matches = Object.keys(usersDB).filter(n => n.toLowerCase().includes(val) && n !== user?.nick);
-  if (!matches.length) { s.style.display='none'; return; }
-  s.innerHTML = matches.map(n => '<div class="suggest-item" onclick="selectPlayer(\''+inputId+'\',\''+suggestId+'\',\''+n+'\')">👤 '+n+'</div>').join('');
+function searchPlayers(inputId,suggestId){
+  const val=document.getElementById(inputId).value.toLowerCase(), s=document.getElementById(suggestId);
+  if(!val){s.style.display='none';return}
+  const matches=Object.keys(usersDB).filter(n=>n.toLowerCase().includes(val)&&n!==user?.nick);
+  if(!matches.length){s.style.display='none';return}
+  s.innerHTML=matches.map(n=>'<div class="suggest-item" onclick="selectPlayer(\''+inputId+'\',\''+suggestId+'\',\''+n+'\')">👤 '+n+'</div>').join('');
   s.style.display='block';
 }
 
-function selectTrack(inputId, suggestId, uid) { document.getElementById(inputId).value = uid; document.getElementById(suggestId).style.display = 'none'; }
-function selectPlayer(inputId, suggestId, nick) { document.getElementById(inputId).value = nick; document.getElementById(suggestId).style.display = 'none'; }
+function selectTrack(inputId,suggestId,uid){document.getElementById(inputId).value=uid;document.getElementById(suggestId).style.display='none'}
+function selectPlayer(inputId,suggestId,nick){document.getElementById(inputId).value=nick;document.getElementById(suggestId).style.display='none'}
 
-async function sendGift() {
-  const trackUid = document.getElementById('giftTrackInput').value.trim();
-  const targetNick = document.getElementById('giftPlayerInput').value.trim();
-  if (!trackUid || !targetNick) return alert('Заполни поля');
-  const track = user.collection.find(t => t.uid === trackUid);
-  if (!track) return alert('Трек не найден');
-  if (!usersDB[targetNick]) return alert('Игрок не найден');
-  try {
-    await db.collection('gifts').add({ from: user.nick, to: targetNick, track, timestamp: Date.now(), status: 'pending' });
-    alert('Подарок отправлен!');
-  } catch(e) { alert('Ошибка: '+e.message); }
+async function sendGift(){
+  const trackUid=document.getElementById('giftTrackInput').value.trim(), targetNick=document.getElementById('giftPlayerInput').value.trim();
+  if(!trackUid||!targetNick)return alert('Заполни поля');
+  const track=user.collection.find(t=>t.uid===trackUid);
+  if(!track)return alert('Трек не найден');
+  if(!usersDB[targetNick])return alert('Игрок не найден');
+  try{await db.collection('gifts').add({from:user.nick,to:targetNick,track,timestamp:Date.now(),status:'pending'});alert('Подарок отправлен!')}catch(e){alert('Ошибка: '+e.message)}
 }
 
-async function sendTrade() {
-  const myUid = document.getElementById('myTrackInput').value.trim();
-  const theirUid = document.getElementById('theirTrackInput').value.trim();
-  const targetNick = document.getElementById('tradePlayerInput').value.trim();
-  if (!myUid || !theirUid || !targetNick) return alert('Заполни все поля');
-  const myTrack = user.collection.find(t => t.uid === myUid);
-  if (!myTrack) return alert('Твой трек не найден');
-  if (!usersDB[targetNick]) return alert('Игрок не найден');
-  try {
-    await db.collection('trades').add({ from: user.nick, to: targetNick, fromTrack: myTrack, toTrackUid: theirUid, status: 'pending', timestamp: Date.now() });
-    alert('Обмен предложен!');
-    loadActiveTrades();
-  } catch(e) { alert('Ошибка: '+e.message); }
+async function sendTrade(){
+  const myUid=document.getElementById('myTrackInput').value.trim(), theirUid=document.getElementById('theirTrackInput').value.trim(), targetNick=document.getElementById('tradePlayerInput').value.trim();
+  if(!myUid||!theirUid||!targetNick)return alert('Заполни все поля');
+  const myTrack=user.collection.find(t=>t.uid===myUid);
+  if(!myTrack)return alert('Твой трек не найден');
+  if(!usersDB[targetNick])return alert('Игрок не найден');
+  try{await db.collection('trades').add({from:user.nick,to:targetNick,fromTrack:myTrack,toTrackUid:theirUid,status:'pending',timestamp:Date.now()});alert('Обмен предложен!');loadActiveTrades()}catch(e){alert('Ошибка: '+e.message)}
 }
 
-async function acceptTrade(tradeId) {
-  try { await db.collection('trades').doc(tradeId).update({ status: 'accepted' }); loadActiveTrades(); } catch(e) {}
-}
-async function rejectTrade(tradeId) {
-  try { await db.collection('trades').doc(tradeId).update({ status: 'rejected' }); loadActiveTrades(); } catch(e) {}
-}
+async function acceptTrade(id){try{await db.collection('trades').doc(id).update({status:'accepted'});loadActiveTrades()}catch(e){}}
+async function rejectTrade(id){try{await db.collection('trades').doc(id).update({status:'rejected'});loadActiveTrades()}catch(e){}}
 
-function sendChat() {
-  const input = document.getElementById('chatInput');
-  const msg = input.value.trim();
-  if (!msg || !user) return;
-  rtdb.ref('chat').push({ nick: user.nick, text: msg, time: firebase.database.ServerValue.TIMESTAMP });
-  input.value = '';
+function sendChat(){
+  const msg=document.getElementById('chatInput').value.trim();
+  if(!msg||!user)return;
+  rtdb.ref('chat').push().set({nick:user.nick,text:msg,time:Date.now()});
+  document.getElementById('chatInput').value='';
 }
 
-function copyID(uid) { navigator.clipboard.writeText(uid).then(()=>alert('Скопировано!')); }
-
-function canOpen() { if (!user) return false; if (!user.lastOpen) return true; return (Date.now()-new Date(user.lastOpen).getTime()) >= 2*60*60*1000; }
-function timeUntil() {
-  if (!user?.lastOpen) return 'Можно открыть!';
-  const diff = 2*60*60*1000 - (Date.now()-new Date(user.lastOpen).getTime());
-  if (diff<=0) return 'Можно открыть!';
-  return 'Через: '+Math.floor(diff/3600000)+'ч '+Math.floor((diff%3600000)/60000)+'м';
+function copyID(uid){navigator.clipboard.writeText(uid).then(()=>alert('Скопировано!'))}
+function canOpen(){if(!user)return false;if(!user.lastOpen)return true;return(Date.now()-new Date(user.lastOpen).getTime())>=2*60*60*1000}
+function timeUntil(){
+  if(!user?.lastOpen)return'Можно открыть!';
+  const diff=2*60*60*1000-(Date.now()-new Date(user.lastOpen).getTime());
+  if(diff<=0)return'Можно открыть!';
+  return'Через: '+Math.floor(diff/3600000)+'ч '+Math.floor((diff%3600000)/60000)+'м';
 }
-
-function updateTimer() {
-  const btn = document.getElementById('openBtn');
-  document.getElementById('timer').textContent = user ? timeUntil() : '';
-  if (user) { btn.disabled = !canOpen(); btn.textContent = canOpen()?'🔓 Открыть кейс':'⏳ Жди'; }
-  else btn.disabled = true;
+function updateTimer(){
+  const btn=document.getElementById('openBtn');
+  document.getElementById('timer').textContent=user?timeUntil():'';
+  if(user){btn.disabled=!canOpen();btn.textContent=canOpen()?'🔓 Открыть кейс':'⏳ Жди'}else btn.disabled=true;
 }
-
-function updateCard(t) {
-  const card = document.getElementById('card'); card.className='card';
-  if (t.rarity!=='common') card.classList.add(t.rarity);
-  card.innerHTML = '<div class="card-icon">'+t.icon+'</div><div class="card-title">'+t.title+'</div><div class="card-artist">'+t.artist+'</div><span class="rarity-badge rarity-'+t.rarity+'">'+t.rarity+'</span><div class="card-id">'+t.uid+'</div>';
+function updateCard(t){
+  const card=document.getElementById('card');card.className='card';
+  if(t.rarity!=='common')card.classList.add(t.rarity);
+  card.innerHTML='<div class="card-icon">'+t.icon+'</div><div class="card-title">'+t.title+'</div><div class="card-artist">'+t.artist+'</div><span class="rarity-badge rarity-'+t.rarity+'">'+t.rarity+'</span><div class="card-id">'+t.uid+'</div>';
 }
-
-function renderCollection() {
-  const list = document.getElementById('collectionList');
-  if (!user?.collection?.length) { list.innerHTML='<div class="empty">Пусто</div>'; return; }
-  list.innerHTML = [...user.collection].reverse().map(t => {
-    const d = new Date(t.obtainedAt).toLocaleDateString('ru-RU');
-    return '<div class="collection-item"><div class="collection-icon">'+t.icon+'</div><div class="collection-info"><div class="collection-title">'+t.title+'</div><div class="collection-artist">'+t.artist+'</div><div class="collection-date">'+d+'</div><div class="collection-id">'+t.uid+' <button class="copy-btn" onclick="copyID(\''+t.uid+'\')">📋</button></div></div><span class="rarity-badge rarity-'+t.rarity+'">'+t.rarity+'</span></div>';
+function renderCollection(){
+  const list=document.getElementById('collectionList');
+  if(!user?.collection?.length){list.innerHTML='<div class="empty">Пусто</div>';return}
+  list.innerHTML=[...user.collection].reverse().map(t=>{
+    const d=new Date(t.obtainedAt).toLocaleDateString('ru-RU');
+    return'<div class="collection-item"><div class="collection-icon">'+t.icon+'</div><div class="collection-info"><div class="collection-title">'+t.title+'</div><div class="collection-artist">'+t.artist+'</div><div class="collection-date">'+d+'</div><div class="collection-id">'+t.uid+' <button class="copy-btn" onclick="copyID(\''+t.uid+'\')">📋</button></div></div><span class="rarity-badge rarity-'+t.rarity+'">'+t.rarity+'</span></div>';
   }).join('');
 }
-
-async function loadActiveTrades() {
-  const container = document.getElementById('activeTrades');
-  container.innerHTML = '<div class="empty">Загрузка...</div>';
-  try {
-    const s1 = await db.collection('trades').where('from','==',user.nick).get();
-    const s2 = await db.collection('trades').where('to','==',user.nick).get();
-    let html = '';
-    s1.forEach(d => { const t = d.data(); html += tradeCard(d.id, t, 'Исходящий'); });
-    s2.forEach(d => { const t = d.data(); html += tradeCard(d.id, t, 'Входящий'); });
-    container.innerHTML = html || '<div class="empty">Нет активных обменов</div>';
-  } catch(e) { container.innerHTML = '<div class="empty">Ошибка</div>'; }
-}
-
-function tradeCard(id, t, dir) {
-  return '<div class="trade-card"><div>'+dir+': '+t.fromTrack.title+' ↔ '+t.toTrackUid+'<br><small>с '+ (dir==='Входящий'?t.from:t.to) +'</small></div><div><span class="status status-'+t.status+'">'+t.status+'</span>'+(t.status==='pending'&&dir==='Входящий'?' <button class="btn btn-small" onclick="acceptTrade(\''+id+'\')">✅</button> <button class="btn btn-small" onclick="rejectTrade(\''+id+'\')">❌</button>':'')+'</div></div>';
+async function loadActiveTrades(){
+  const container=document.getElementById('activeTrades');container.innerHTML='<div class="empty">Загрузка...</div>';
+  try{
+    const s1=await db.collection('trades').where('from','==',user.nick).get(), s2=await db.collection('trades').where('to','==',user.nick).get();
+    let html='';
+    s1.forEach(d=>{const t=d.data();html+='<div class="trade-card"><div>Исходящий: '+t.fromTrack.title+' ↔ '+t.toTrackUid+'<br><small>с '+t.to+'</small></div><div><span class="status status-'+t.status+'">'+t.status+'</span></div></div>'});
+    s2.forEach(d=>{const t=d.data();html+='<div class="trade-card"><div>Входящий: '+t.fromTrack.title+' ↔ '+t.toTrackUid+'<br><small>от '+t.from+'</small></div><div><span class="status status-'+t.status+'">'+t.status+'</span>'+(t.status==='pending'?' <button class="btn btn-small" onclick="acceptTrade(\''+d.id+'\')">✅</button> <button class="btn btn-small" onclick="rejectTrade(\''+d.id+'\')">❌</button>':'')+'</div></div>'});
+    container.innerHTML=html||'<div class="empty">Нет активных обменов</div>';
+  }catch(e){container.innerHTML='<div class="empty">Ошибка</div>'}
 }
 
 // Chat listener
-rtdb.ref('chat').on('child_added', (snap) => {
+rtdb.ref('chat').on('child_added', snap => {
   const msg = snap.val();
   const box = document.getElementById('chatBox');
-  const time = msg.time ? new Date(msg.time).toLocaleTimeString().slice(0,5) : '';
+  const time = msg.time ? new Date(msg.time).toLocaleTimeString().slice(0,5) : '--:--';
   box.innerHTML += '<div class="chat-msg"><span class="nick">'+msg.nick+'</span> <span class="time">'+time+'</span><br>'+msg.text+'</div>';
   box.scrollTop = box.scrollHeight;
 });
 
-document.addEventListener('click', function(e) {
-  if (!e.target.closest('.rarity-dropdown')) document.getElementById('dropdownMenu').classList.remove('show');
-  if (!e.target.closest('#giftTrackInput') && !e.target.closest('#giftSuggest')) document.getElementById('giftSuggest').style.display='none';
-  if (!e.target.closest('#giftPlayerInput') && !e.target.closest('#giftPlayerSuggest')) document.getElementById('giftPlayerSuggest').style.display='none';
-  if (!e.target.closest('#myTrackInput') && !e.target.closest('#myTrackSuggest')) document.getElementById('myTrackSuggest').style.display='none';
-  if (!e.target.closest('#tradePlayerInput') && !e.target.closest('#tradePlayerSuggest')) document.getElementById('tradePlayerSuggest').style.display='none';
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.rarity-dropdown'))document.getElementById('dropdownMenu').classList.remove('show');
+  if(!e.target.closest('#giftTrackInput')&&!e.target.closest('#giftSuggest'))document.getElementById('giftSuggest').style.display='none';
+  if(!e.target.closest('#giftPlayerInput')&&!e.target.closest('#giftPlayerSuggest'))document.getElementById('giftPlayerSuggest').style.display='none';
+  if(!e.target.closest('#myTrackInput')&&!e.target.closest('#myTrackSuggest'))document.getElementById('myTrackSuggest').style.display='none';
+  if(!e.target.closest('#tradePlayerInput')&&!e.target.closest('#tradePlayerSuggest'))document.getElementById('tradePlayerSuggest').style.display='none';
 });
 
-// Init
-loadUsersDB(); loadUser();
-if (localStorage.getItem('lootmusic_theme')==='dark') { isDark=true; document.getElementById('body').classList.add('dark'); document.querySelector('.theme-btn').textContent='☀️'; }
-if (!user) { document.getElementById('loginModal').style.display='flex'; document.getElementById('openBtn').disabled=true; }
-else { document.getElementById('loginModal').style.display='none'; }
+loadUsersDB();loadUser();
+if(localStorage.getItem('lootmusic_theme')==='dark'){isDark=true;document.getElementById('body').classList.add('dark');document.querySelector('.theme-btn').textContent='☀️'}
+if(!user){document.getElementById('loginModal').style.display='flex';document.getElementById('openBtn').disabled=true}
+else document.getElementById('loginModal').style.display='none';
 switchTab('crate');
-setInterval(updateTimer, 1000);
+setInterval(updateTimer,1000);
 </script>
 </body>
 </html>
