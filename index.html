@@ -143,11 +143,12 @@ const db=firebase.firestore(),rtdb=firebase.database();
 const ADMIN={uid:"435498",nick:"LOOTMUSIC",pass:"901901OOIBLOOBLOO__"};
 const tracks=[{title:"Аппетит",artist:"Дайте танк (!)",icon:"🍽️",audio:"https://ru-d3.drivemusic.me/dl/yX8JSuNNpn_vvB3eP0PwNg/1783219830/download_music/2024/07/dajjte-tank-appetit.mp3"},{title:"Братик, выдыхай",artist:"Антон Небо",icon:"🌬️",audio:"https://ru-d3.drivemusic.me/dl/eQKgtyNjGVUB1kijrwMiMA/1783219954/download_music/2026/01/anton-nebo-bratik-vydykhajj.mp3"},{title:"Играю в роблокс",artist:"Черный Джек",icon:"🎮",audio:"https://ru-d2.drivemusic.me/dl/im9EndZ8xjE5zmO4KLG6Hw/1783219983/download_music/2026/01/chernyjj-dzhek-igraju-v-robloks.mp3"},{title:"Она похоронена здесь",artist:"Щенки",icon:"🪦",audio:"https://ru-d2.drivemusic.me/dl/4UQO0aBj_svn2jwjhwhuXA/1783220126/download_music/2024/11/shhenki-ona-pokhoronena-zdes.mp3"},{title:"Нихуя",artist:"Щенки",icon:"💥",audio:"https://ru-d1.drivemusic.me/dl/Iki0ZEgO79Aexb6UhlbvxA/1783220160/download_music/2026/01/shhenki-nikhuja.mp3"}];
 let user=null,isDark=false,currentTrack=null,dmPartner=null,adminDMTarget=null;
-const DAY=86400000,TRADE_TIMEOUT_ONLINE=10000,TRADE_TIMEOUT_OFFLINE=600000,MUTE_DURATION=86400000,SPAM_LIMIT=5,SPAM_WINDOW=10000;
+const DAY=86400000,TRADE_TIMEOUT_ONLINE=10000,TRADE_TIMEOUT_OFFLINE=600000,MUTE_DURATION=86400000,SPAM_LIMIT=5,SPAM_WINDOW=10000,NEWBIE_GIFT_BAN=86400000;
 let messageTimestamps=[];
 
 function genID(){let id='';for(let i=0;i<6;i++)id+=Math.floor(Math.random()*10);return id}
 function DK(a,b){return[a,b].sort().join('_')}
+function canGift(u){if(!u?.createdAt)return true;return(Date.now()-new Date(u.createdAt).getTime())>=NEWBIE_GIFT_BAN}
 const onlineRef=rtdb.ref('online');
 
 async function saveUser(u){try{await db.collection('users').doc(u.uid).set(u)}catch(e){}}
@@ -157,7 +158,6 @@ async function getOnlineUsers(cb){onlineRef.once('value',snap=>{const uids=[];sn
 function isMuted(u){if(!u?.mutedUntil)return false;if(Date.now()>u.mutedUntil){u.mutedUntil=null;saveUser(u);return false}return true}
 function checkSpam(){const now=Date.now();messageTimestamps.push(now);messageTimestamps=messageTimestamps.filter(t=>now-t<SPAM_WINDOW);return messageTimestamps.length>SPAM_LIMIT}
 
-// UI
 document.getElementById('themeBtn').onclick=function(){isDark=!isDark;document.getElementById('body').classList.toggle('dark',isDark);this.textContent=isDark?'☀️':'🌙';localStorage.setItem('lootmusic_theme',isDark?'dark':'light')};
 document.getElementById('toRegister').onclick=function(){document.getElementById('loginBox').style.display='none';document.getElementById('registerBox').style.display='block'};
 document.getElementById('toLogin').onclick=function(){document.getElementById('registerBox').style.display='none';document.getElementById('loginBox').style.display='block'};
@@ -191,11 +191,10 @@ document.getElementById('loginBtn').onclick=async function(){
 
 document.getElementById('logoutBtn').onclick=function(){if(confirm('Выйти?')){onlineRef.child(user.uid).remove();localStorage.removeItem('lootmusic_uid');user=null;document.getElementById('loginModal').style.display='flex';switchTab('crate');document.getElementById('card').innerHTML='<div class="card-icon">🎁</div><div class="card-title">???</div><div class="card-artist">Unknown</div>';document.getElementById('ratingBox').style.display='none';currentTrack=null}};
 
-document.getElementById('supportBtn').onclick=function(){if(!user||user.uid===ADMIN.uid)return;openDM(ADMIN.uid)};
+document.getElementById('supportBtn').onclick=function(){if(!user){alert('Сначала войдите!');return}if(user.uid===ADMIN.uid){alert('Вы админ!');return}switchTab('chat');setTimeout(function(){openDM(ADMIN.uid)},300)};
 
 document.getElementById('openBtn').onclick=function(){if(!user)return;if(!canOpen())return;this.disabled=true;document.getElementById('ratingBox').style.display='none';setTimeout(()=>{currentTrack={...tracks[Math.floor(Math.random()*tracks.length)]};currentTrack.obtainedAt=new Date().toISOString();currentTrack.rated=false;user.lastOpen=new Date().toISOString();if(!user.collection)user.collection=[];user.collection.push(currentTrack);saveUser(user);updateCard(currentTrack);document.getElementById('ratingBox').style.display='block';showRatingStars();playTrack(currentTrack);updateTimer()},800)};
 
-// T9 search
 function setupSuggestions(inputId,suggestId,sourceFn){
   const input=document.getElementById(inputId),suggest=document.getElementById(suggestId);
   input.oninput=function(){const v=this.value.toLowerCase();if(!v){suggest.style.display='none';return}sourceFn(v,function(items){if(!items.length){suggest.style.display='none';return}suggest.innerHTML=items.map(i=>'<div class="suggest-item" data-val="'+i.val+'">'+i.text+'</div>').join('');suggest.style.display='block';suggest.querySelectorAll('.suggest-item').forEach(el=>el.onclick=function(){input.value=this.dataset.val;suggest.style.display='none'})})};
@@ -208,6 +207,7 @@ setupSuggestions('tradePlayer','tradePlayerSuggest',function(v,cb){getOnlineUser
 
 // Gift
 document.getElementById('giftBtn').onclick=async function(){
+  if(!canGift(user))return alert('Новичкам нельзя дарить треки 24 часа после регистрации!');
   const tt=document.getElementById('giftTrack').value.trim(),tp=document.getElementById('giftPlayer').value.trim();
   if(!tt||!tp)return alert('Заполни');const t=user.collection?.find(x=>x.title.toLowerCase()===tt.toLowerCase());
   if(!t)return alert('Трек не найден');
@@ -242,7 +242,6 @@ async function loadActiveTrades(){
   let h='';s1.forEach(d=>{const t=d.data();h+='<div class="trade-card"><div>📤 '+t.fromTrack.title+' ↔ '+(t.toTrackWanted||'?')+'<br><small>'+t.to+'</small></div><div><span class="status status-pending">ждём</span></div></div>'});
   s2.forEach(d=>{const t=d.data();h+='<div class="trade-card"><div>📥 '+t.fromTrack.title+' ↔ '+(t.toTrackWanted||'?')+'<br><small>от '+t.from+'</small></div><div><span class="status status-pending">'+formatTimeout(t.expiresAt)+'</span> <button class="btn btn-small" onclick="acceptTrade(\''+d.id+'\')">✅</button> <button class="btn btn-small" onclick="rejectTrade(\''+d.id+'\')">❌</button></div></div>'});
   c.innerHTML=h||'<div class="empty">Нет обменов</div>';
-  // History
   const hs=await db.collection('history').where('fromId','==',user.uid).orderBy('timestamp','desc').limit(10).get();
   const hs2=await db.collection('history').where('toId','==',user.uid).orderBy('timestamp','desc').limit(10).get();
   let hist='';hs.forEach(d=>{const t=d.data();hist+='<div style="font-size:10px;padding:2px 0">'+t.type+' 📤 '+t.track+(t.toTrack?' ↔ '+t.toTrack:'')+' → '+t.to+'</div>'});
@@ -254,9 +253,8 @@ function formatTimeout(exp){if(!exp)return'';const d=exp-Date.now();if(d<=0)retu
 
 async function updateNotifs(){
   if(!user)return;const s=await db.collection('trades').where('toId','==',user.uid).where('status','==','pending').get();
-  const gifts=await db.collection('history').where('toId','==',user.uid).where('type','==','gift').where('timestamp','>',Date.now()-3600000).get();
-  const count=s.size+gifts.size;const badge=document.getElementById('tradeBadge');
-  if(count>0){badge.style.display='flex';badge.textContent=count}else{badge.style.display='none'}
+  const badge=document.getElementById('tradeBadge');
+  if(s.size>0){badge.style.display='flex';badge.textContent=s.size}else{badge.style.display='none'}
 }
 
 // Chat
@@ -298,10 +296,7 @@ rtdb.ref('global').on('child_added',snap=>{const m=snap.val();if(Date.now()-m.ti
 
 onlineRef.on('value',snap=>{document.getElementById('onlineCount').textContent='🟢 '+(snap.numChildren()||0)});
 
-// Auto-expire trades
 setInterval(async()=>{const snap=await db.collection('trades').where('status','==','pending').get();snap.forEach(async d=>{const t=d.data();if(t.expiresAt&&Date.now()>t.expiresAt){await db.collection('trades').doc(d.id).update({status:'expired'})}})},5000);
-
-// Auto-clean old messages
 setInterval(()=>{const c=Date.now()-DAY;rtdb.ref('global').orderByChild('time').endAt(c).once('value',snap=>{snap.forEach(s=>s.ref.remove())})},600000);
 
 // Rating
@@ -333,14 +328,14 @@ function switchTab(t){
 
 document.querySelectorAll('.tab').forEach(tab=>{tab.onclick=function(){switchTab(this.dataset.tab)}});
 
+window.acceptTrade=acceptTrade;window.rejectTrade=rejectTrade;window.openDM=openDM;window.viewProfile=viewProfile;window.copyID=function(id){navigator.clipboard.writeText(id)};window.PT=playTrack;window.closePlayer=function(){document.getElementById('globalPlayer').style.display='none';document.getElementById('globalAudio').pause()};
+
 (async function init(){
 if(localStorage.getItem('lootmusic_theme')==='dark'){isDark=true;document.getElementById('body').classList.add('dark');document.getElementById('themeBtn').textContent='☀️'}
 const uid=localStorage.getItem('lootmusic_uid');
 if(uid){loadUser(uid,async function(data){if(data){user=data;onlineRef.child(user.uid).set(true);onlineRef.child(user.uid).onDisconnect().remove();document.getElementById('loginModal').style.display='none'}else{localStorage.removeItem('lootmusic_uid');document.getElementById('loginModal').style.display='flex'}switchTab('crate');setInterval(updateTimer,1000);setInterval(updateNotifs,5000)})}else{document.getElementById('loginModal').style.display='flex';switchTab('crate');setInterval(updateTimer,1000)}
 })();
 
-// Expose to window
-window.acceptTrade=acceptTrade;window.rejectTrade=rejectTrade;window.openDM=openDM;window.viewProfile=viewProfile;window.copyID=function(id){navigator.clipboard.writeText(id)};window.PT=playTrack;window.closePlayer=function(){document.getElementById('globalPlayer').style.display='none';document.getElementById('globalAudio').pause()};
 };
 </script>
 </body>
