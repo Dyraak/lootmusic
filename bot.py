@@ -11,51 +11,23 @@ ADMIN_ID = 5391216648
 
 logging.basicConfig(level=logging.INFO)
 
-# Ключ собирается из частей (Google не видит)
-_p1 = "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCqIsMeZPN6PInY"
-_p2 = "HwEwg23edBaxfp5jHqzST3Kmeqm+nloCcZ+6i6BOHEYpdsX61VW9+2oXkOoLgZdw"
-_p3 = "/JkDC7HUMs9y2oXgyls84CLw6Fc4rRYgs2IXMoWF7eYS57yl0ggB2vLI2aQpFefP"
-_p4 = "jQpXjJZmQLOzv9kyN4hzfPQ08Oq6U4ZgJ9/8BXEjTBxmzfj74IA0vG2GP32d5Dgn"
-_p5 = "fgW6U15igFzfDj3Md0Va71kHh04a1Lx/eCHD7vKaJ50j3FReNCQ03PUJ7kdv4aV8"
-_p6 = "HdHtQpnVcgHOexQ+VIHOXES9J7wQBJi77ol2iO4n09nUjopc9gp5VwPB893wVhmi"
-_p7 = "IvaKhnj5AgMBAAECggEABNmwmxpY7CJTcjVBEw1eKZ5A4t7HnG8MkYLZE4ix8+if"
-_p8 = "C4yKd5ahM3TgJbC4iHQCSaQkJEeZ+om/Y+XZpWH1GAX6Ts2OzUerlfbUXC6dhPS/"
-_p9 = "SZ+fk2Z58sVjXqTbZpVQK+BedU4qHU898Hd2hOQxyfi8fsqAgktdwSAd9K/tGzJ4"
-_pa = "PZMVDBlswybUU1DRQ98a9Y5sV3enRvX2wv2Pnjm/OAP7pn4VCA+7dgMndi3HbCtp"
-_pb = "i85sh7KQEPsxr7cxqwXlMfMix8wZ3s+CQ6bcFDye7x0aT74moqM3ZULXb2VDdymE"
-_pc = "QStaBl6c8Nrp4akk2/U+18sBHZDij7MTdXS5N4hfAQKBgQDXXKaCwK6chhZn+rbk"
-_pd = "4TKqa8dih6+xEm55p0cFrOUSvvRAR7q59r+a6ds2Sdl9XY4CVA8ytXystiHiii+o"
-_pe = "lXyyNS1k26hOYkZJGSV4myMrZndo8OGbIuRZt+fVpnG8ak4x6IaM2d8ua08tt6wr"
-_pf = "cdmkZS5RE8XNzvz7YIGwTaxrAQKBgQDKPWcBggtEaOzQitS735LiCwQGrRsCbajs"
-_pg = "hx/P7+wNBSlm8Y374G/qvObsa1UvehMgsnqdRk1ymo/9pgFdH5gW/TD2N297uoFV"
-_ph = "ndG60AgUrAykbjWfBYBauAALg1arrtOdaz3CPxhzZ6fnnp6CmPRh9oP/lsRaja0F"
-_pi = "CnA3Lptl+QKBgQCwKXFq8wHhty0M0OBaSHuRO6hUyHjGdzU2/cXytoKK2vggvIvZ"
-_pj = "IiWJKlHODoqBKc3HycrEx/+7pyAAlth1JhJiE22WWrdJpsmncZJdHUmfbqmuhZuF"
-_pk = "svznBq/067mNTce4u2OUQ4N0DQMvelazEuXcu4cveuUKfI4jccWj2WV4AQKBgFPy"
-_pl = "0QMrPAoVk9etCUlDMPFrqSwsRv3nDyu/m1DxQobVEa6NrmZTb6F88E5K731Zqv7z"
-_pm = "lzoZqKRdzE95zS8eoj9Isj5CHKC7dlxXumtVV0VddZH7vX5ZBkKiBkLBLgTt+SFr"
-_pn = "FqO/FSMyb9wRV7LWUvsnHPvHVZJRJPTmtFXznsXhAoGAETsk58TQlYcfYEmDsxxf"
-_po = "/qHthbAbJbM/ZJC9zSiHwjJnGGUo6MoDXZuNHrh8oh3DKnDCPk3nxLmp50JxPhuA"
-_pp = "3fMPu323w5y30jiIXIhmGsdeVoBS6ol0h2fJ7iQ6zHAD0o96c+IkyiRAMgB/9nKu"
-_pq = "jz2HoyPfffXqtBNUHRuwda8="
-_key = "-----BEGIN PRIVATE KEY-----\n" + _p1+"\n"+_p2+"\n"+_p3+"\n"+_p4+"\n"+_p5+"\n"+_p6+"\n"+_p7+"\n"+_p8+"\n"+_p9+"\n"+_pa+"\n"+_pb+"\n"+_pc+"\n"+_pd+"\n"+_pe+"\n"+_pf+"\n"+_pg+"\n"+_ph+"\n"+_pi+"\n"+_pj+"\n"+_pk+"\n"+_pl+"\n"+_pm+"\n"+_pn+"\n"+_po+"\n"+_pp+"\n"+_pq+"\n-----END PRIVATE KEY-----\n"
+_key = "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDucK3viMchb/9g\n6VwKYDbJUEGdmm6G18fUH/9wGV7xaaPu37mv+6OQezbjTQDZKCbb5noSAIBoiMae\nYQj2hrbN0K/fwyDFjKbKhHfUla6GRmHMq4hHzVNmIfUoyRw43DMq+e+zgDn8hNdb\n5CtGgO1BWihSe5sHOwvwnpPO33nu47ySZ88x8tpEFMWTecFu7rCXaBcL0xTJ2kQ6\nO223I4kNijEBhaYDhuz77I+s8FGzIkhB2S2YK4k6IefjXxCa7ZR2h4yailoe+9va\nVqgJsY06EFReaMCm6rw5sDnQ/jSXiEz1G1JdtvEjs70axGkXTmNRM3QG1nZ4gBVG\n2YW3F3RPAgMBAAECggEAEHB/ZYj6JcGJi357ZJG+pUGdzIZ1wWFGO0dbfriZFa7x\naQpOzKXeYJtGLQTFnrNIfpfU6cHUGKD5hLju+8RM/UK6pYRYEZbBdywL8QHC7yoS\nGyDmfADZk6yasQ2wnvD7rCZgUvFvzgvAp2rDWxCPixZyukEgbq6xA42DZlt9Fi3G\nZIdN66r4sja6PA0CpVsbsRtCD1yuR7khgjCiOmItlzL5I6RtQfzLQ3qc8SykgSzC\nsXojrj8IQm0q6YHU+PpGyoL46BY7NEDnZqczf8N9zuU3bgcwTtCxGeBVi24/DwHQ\no3fVrUcaQWZPblkYMnHiRdXH1NBnsCtW1MKDp/EpLQKBgQD3ZFzVuo3YU5tVnB8i\nEujbmT4ckgI1as1qZI87sW5WY3Umkcif2/TTzCZEQQdGWT3JHazqMTlFgUqeMLH/\nEqJUM+jOxtFZZS2qoiJdz8SmGl+1Oww2aRwVEzkIgUQQvtwwNAsHv7Ovs5aFxLUO\n8iGgbgN3z8Y68LtFot0Od/zBbQKBgQD2vJP/9H8/Owm29/3dk0a6jPfbVipoxHgs\nKnqDRBdiWOs84c+55obWg/GrUuRU7eQqB9N5dVptHI9CS2DeCvwzYgyaIWPjmwG9\njZt67I/tIr95s/gZJ+jjruzX3W9/E5LHYsokpsAPTBsEI3b5LSFjsWmCioEXUq47\n0c0ib1tzKwKBgAW83ipW2VNbHQ8vP8mahqwRMc+X01VJ1NnS2z+XLefzBpSObQjI\nITWIVprepzyKdVRky83itmFWTlS87GPuGrW5Pn0NP23DWvvKJuHmH7l6gx3A8NeS\nOISEnZ4E4X9B7flwO5FCcPhyQdt4ZHqkQwNlic8NkptrWeyTimz7e3FBAoGAP2Cd\nG4fwD4vYqPj2aq3j4xNGrz5o0lR1EdMvePxKjWaNtivCsdu3Eu79aqZ2JCKfEvTD\nq1Urjw9g9QRrs11a/s/WsNiW0eYFAm2XXHHbXmwohthliACqX6GVELW+aAPdFf4Y\nMmXqu4MvBVcevk6LXxI5KeDt29HPE2qGqKu179UCgYEA3Kgi08vKfhI4bs0hOvGh\nbbCLoXUOrEAlPOUjfHEeJQJcoXPcKxso+tMqzkjzG/78dZywr7ott2n+8qBp9Q3h\n2/4Mr81T52pNfWXfakr4E3d27qzUyLGvNixV7xbyUezea2vznbNjs8Y323NUgk7E\nCMj73kUn9FzaILACH1OVLqo=\n-----END PRIVATE KEY-----\n"
 
 cred = credentials.Certificate({
   "type": "service_account",
   "project_id": "lootmusic-e6049",
-  "private_key_id": "0ef2d12f930b68a5ba25a55f60c715cb8fd8c889",
+  "private_key_id": "f8344a2083ba7a03a50485f838dfd6529916014a",
   "private_key": _key,
-  "client_email": "lootmusic-bot@lootmusic-e6049.iam.gserviceaccount.com",
-  "client_id": "106898834451394716825",
+  "client_email": "firebase-adminsdk-fbsvc@lootmusic-e6049.iam.gserviceaccount.com",
+  "client_id": "103469319637441226900",
   "token_uri": "https://oauth2.googleapis.com/token",
   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/lootmusic-bot%40lootmusic-e6049.iam.gserviceaccount.com"
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40lootmusic-e6049.iam.gserviceaccount.com"
 })
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
-# Фейковый сервер для Render
 class DummyHandler(BaseHTTPRequestHandler):
     def do_GET(self): self.send_response(200); self.end_headers(); self.wfile.write(b"OK")
 threading.Thread(target=lambda: HTTPServer(('0.0.0.0', 10000), DummyHandler).serve_forever(), daemon=True).start()
@@ -217,7 +189,6 @@ async def handle_text(update: Update, context):
     text = update.message.text.strip()
     users = get_users(); ratings = get_ratings(); tracks = get_tracks()
 
-    # АДМИН-КОМАНДЫ
     if update.effective_user.id == ADMIN_ID:
         if text == "/test":
             if tracks:
@@ -253,7 +224,6 @@ async def handle_text(update: Update, context):
                 if u.get("username","")==t or u.get("nick","")==t: u["banned"]=False; save_user(i,u); await update.message.reply_text(f"✅ {t}"); return
             await update.message.reply_text("Не найден."); return
 
-    # ОСТАЛЬНЫЕ КОМАНДЫ
     if "gift_idx" in context.user_data:
         target = text.replace("@","").strip(); tid = None
         for i,u in users.items():
