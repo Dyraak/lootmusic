@@ -62,11 +62,17 @@ async def start(update: Update, context):
     if u.get("banned"):
         await update.message.reply_text("🚫 Вы забанены.")
         return
+    # Проверка: готов ли кейс
+    msg = "🎵 LootMusic Bot\nОткрывай кейсы, собирай треки, оценивай!\nПоддержка: @dyraak0"
+    if u.get("last_open"):
+        last = datetime.fromisoformat(u["last_open"])
+        if datetime.now() - last >= timedelta(hours=2):
+            msg = "🔔 Твой кейс готов!\n\n" + msg
     kb = [[InlineKeyboardButton("🎁 Открыть кейс",callback_data="open")],
           [InlineKeyboardButton("📦 Коллекция",callback_data="col")],
           [InlineKeyboardButton("👤 Профиль",callback_data="profile")],
           [InlineKeyboardButton("🔍 Найти трек",callback_data="shazam_info")]]
-    await update.message.reply_text("🎵 LootMusic Bot\nОткрывай кейсы, собирай треки, оценивай!\nПоддержка: @dyraak0",reply_markup=InlineKeyboardMarkup(kb))
+    await update.message.reply_text(msg,reply_markup=InlineKeyboardMarkup(kb))
 
 async def button(update: Update, context):
     q = update.callback_query; await q.answer()
@@ -180,6 +186,17 @@ async def handle_text(update: Update, context):
     users = get_users(); ratings = get_ratings(); tracks = get_tracks()
 
     if update.effective_user.id == ADMIN_ID:
+        # Тестовый кейс
+        if text == "/test":
+            if not tracks: await update.message.reply_text("Нет треков.")
+            else:
+                track = weighted_choice(tracks, ratings)
+                await update.message.reply_text(f"🧪 ТЕСТ: {track['title']} — {track['artist']} ({track.get('rarity','common')})")
+                if os.path.exists(track.get("file","")):
+                    with open(track["file"],"rb") as f: await context.bot.send_audio(chat_id=uid,audio=f,title=track["title"],performer=track["artist"])
+            return
+
+        # Название трека после загрузки аудио
         if "pending_audio" in context.user_data:
             if " — " in text:
                 title, artist = text.split(" — ",1)
@@ -268,6 +285,12 @@ async def handle_text(update: Update, context):
         for k in ["trade_my_idx","trade_target","trade_my_track"]:
             if k in context.user_data: del context.user_data[k]; return
 
+    if "awaiting_request" in context.user_data:
+        await context.bot.send_message(chat_id=ADMIN_ID,text=f"📩 @{users[uid].get('username',uid)} хочет добавить:\n{text}")
+        del context.user_data["awaiting_request"]
+        await update.message.reply_text("✅ Запрос отправлен админу! Спасибо!")
+        return
+
     query = text.lower().strip()
     matches = difflib.get_close_matches(query,[t["title"].lower() for t in tracks],n=3,cutoff=0.4)
     if matches:
@@ -307,7 +330,6 @@ async def handle_audio(update: Update, context):
         await update.message.reply_text(txt[:4000])
     else:
         kb=[[InlineKeyboardButton("📩 Отправить запрос",callback_data="req_admin")]]
-        context.user_data["shazam_request"]=title
         await update.message.reply_text("❌ Не найдено. Отправить запрос?",reply_markup=InlineKeyboardMarkup(kb))
 
 async def button_admin(update: Update, context):
@@ -327,11 +349,9 @@ async def button_admin(update: Update, context):
         _,_,fu,tu=q.data.split("_")
         await context.bot.send_message(chat_id=fu,text="❌ Отклонён."); await q.message.reply_text("Отклонён."); return
     if q.data=="req_admin":
-        users=get_users(); uid=str(q.from_user.id)
-        req=context.user_data.get("shazam_request","?")
-        await context.bot.send_message(chat_id=ADMIN_ID,text=f"📩 @{users[uid].get('username',uid)}: добавить '{req}'")
-        if "shazam_request" in context.user_data: del context.user_data["shazam_request"]
-        await q.message.reply_text("✅ Отправлено!"); return
+        context.user_data["awaiting_request"] = True
+        await q.message.reply_text("📝 Какую песню хотите видеть в боте? Напиши название и исполнителя:")
+        return
 
 def main():
     app = Application.builder().token(TOKEN).build()
