@@ -180,6 +180,20 @@ async def handle_text(update: Update, context):
     users = get_users(); ratings = get_ratings(); tracks = get_tracks()
 
     if update.effective_user.id == ADMIN_ID:
+        if "pending_audio" in context.user_data:
+            if " — " in text:
+                title, artist = text.split(" — ",1)
+            elif "-" in text:
+                title, artist = text.split("-",1)
+            else:
+                title, artist = text, "Неизвестен"
+            file_path = context.user_data["pending_audio"]
+            kb = [[InlineKeyboardButton(r.capitalize(),callback_data=f"addrar_{r}")] for r in ["common","rare","epic","legendary"]]
+            context.user_data["new_track"]={"title":title.strip(),"artist":artist.strip(),"file_path":file_path}
+            del context.user_data["pending_audio"]
+            await update.message.reply_text(f"🎵 {title.strip()} — {artist.strip()}\nРедкость:",reply_markup=InlineKeyboardMarkup(kb))
+            return
+
         if text.startswith("/broadcast "):
             msg = text[len("/broadcast "):]
             for u in users:
@@ -274,14 +288,12 @@ async def handle_audio(update: Update, context):
     audio = update.message.audio or update.message.voice
     if not audio: return
     if uid == ADMIN_ID:
-        title = audio.file_name or "Без названия"
-        artist = "Неизвестен"
         file = await context.bot.get_file(audio.file_id)
         file_path = os.path.join(MUSIC_DIR, f"{audio.file_id}.mp3")
         await file.download_to_drive(file_path)
-        kb = [[InlineKeyboardButton(r.capitalize(),callback_data=f"addrar_{r}")] for r in ["common","rare","epic","legendary"]]
-        context.user_data["new_track"]={"title":title,"artist":artist,"file_path":file_path}
-        await update.message.reply_text(f"🎵 {title}\nРедкость:",reply_markup=InlineKeyboardMarkup(kb)); return
+        context.user_data["pending_audio"] = file_path
+        await update.message.reply_text("🎵 Введи название и исполнителя:\n`Название — Исполнитель`", parse_mode="Markdown")
+        return
     title = (audio.file_name or "").lower().strip()
     matches = difflib.get_close_matches(title,[t["title"].lower() for t in tracks],n=3,cutoff=0.4)
     if matches:
@@ -304,7 +316,7 @@ async def button_admin(update: Update, context):
         r=q.data.split("_")[1]
         if "new_track" in context.user_data:
             t=context.user_data["new_track"]; add_track(t["title"],t["artist"],t["file_path"],r)
-            await q.message.reply_text(f"✅ {t['title']} ({r})"); del context.user_data["new_track"]; return
+            await q.message.reply_text(f"✅ {t['title']} — {t['artist']} ({r})"); del context.user_data["new_track"]; return
     if q.data.startswith("trade_acc_"):
         _,_,fu,mi,tu,ti=q.data.split("_"); mi,ti=int(mi),int(ti); users=get_users()
         mt=users[fu]["collection"].pop(mi); tt=users[tu]["collection"].pop(ti)
