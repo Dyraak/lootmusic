@@ -368,5 +368,20 @@ def main():
     print("Бот запущен!")
     app.run_polling()
 
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
+
+class DummyHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"OK")
+
+def run_dummy_server():
+    server = HTTPServer(('0.0.0.0', 10000), DummyHandler)
+    server.serve_forever()
+
+threading.Thread(target=run_dummy_server, daemon=True).start()
+
 if __name__=="__main__":
     main()
