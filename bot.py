@@ -78,7 +78,49 @@ def weighted_choice(tracks, ratings):
         if r <= acc: return tracks[i]
     return tracks[-1]
 
-async def start(update: Update, context):
+def menu_kb():
+    return [[InlineKeyboardButton("🎁 Открыть кейс",callback_data="open")],
+          [InlineKeyboardButton("📦 Коллекция",callback_data="col")],
+          [InlineKeyboardButton("👤 Профиль",callback_data="profile")],
+          [InlineKeyboardButton("🔍 Найти трек",callback_data="shazam_info")]]
+
+async def do_open(update, context, uid, u, tracks, ratings):
+    if u.get("last_open") and datetime.now() - datetime.fromisoformat(u["last_open"]) < timedelta(hours=2):
+        left = timedelta(hours=2) - (datetime.now() - datetime.fromisoformat(u["last_open"]))
+        await update.message.reply_text(f"⏳ {left.seconds//3600}ч {(left.seconds%3600)//60}м"); return
+    if not tracks: await update.message.reply_text("Нет треков."); return
+    collected = [t["title"] for t in u["collection"]]
+    available = [t for t in tracks if t["title"] not in collected]
+    if not available: await update.message.reply_text("🎉 Всё собрано!"); return
+    track = weighted_choice(available, ratings).copy()
+    track["obtained_at"] = datetime.now().isoformat(); track["rated"] = False
+    u["last_open"] = datetime.now().isoformat(); u["collection"].append(track)
+    save_user(uid, u)
+    idx = len(u["collection"])-1
+    kb = [[InlineKeyboardButton(f"⭐ {i}",callback_data=f"rate_{i}_{idx}")] for i in range(1,6)]
+    await update.message.reply_text(f"🎁 {track['title']} — {track['artist']}\nОцени:",reply_markup=InlineKeyboardMarkup(kb))
+    if track.get("file_id"): await update.message.reply_audio(audio=track["file_id"],title=track["title"],performer=track["artist"])
+
+async def do_col(update, context, u):
+    if not u.get("collection"): await update.message.reply_text("📦 Пусто.")
+    else:
+        kb = []
+        for i,t in enumerate(u["collection"]):
+            r = f"⭐{t.get('rating','?')}" if t.get("rated") else "—"
+            kb.append([InlineKeyboardButton(f"{i+1}. {t['title']} — {t['artist']} {r}",callback_data=f"listen_{i}")])
+        kb.append([InlineKeyboardButton("🎁 Подарить",callback_data="gift_menu"),InlineKeyboardButton("🔄 Обмен",callback_data="trade_menu")])
+        kb.append([InlineKeyboardButton("« Назад",callback_data="main_menu")])
+        await update.message.reply_text("📦",reply_markup=InlineKeyboardMarkup(kb))
+
+async def do_profile(update, context, uid, u):
+    rd = u.get("created_at","?")
+    if rd!="?": rd = datetime.fromisoformat(rd).strftime("%d.%m.%Y")
+    await update.message.reply_text(f"👤 {u['nick']}\n🆔 {uid}\n📅 {rd}\n🎵 {len(u['collection'])}")
+
+async def do_search(update, context): pass  # handled in handle_text
+
+# КОМАНДЫ
+async def cmd_start(update: Update, context):
     uid = str(update.effective_user.id)
     users = get_users()
     if uid not in users:
@@ -88,11 +130,30 @@ async def start(update: Update, context):
     if u.get("banned"): await update.message.reply_text("🚫"); return
     msg = "🎵 LootMusic Bot\nПоддержка: @dyraak0"
     if u.get("last_open") and datetime.now() - datetime.fromisoformat(u["last_open"]) >= timedelta(hours=2): msg = "🔔 Кейс готов!\n\n" + msg
-    kb = [[InlineKeyboardButton("🎁 Открыть кейс",callback_data="open")],
-          [InlineKeyboardButton("📦 Коллекция",callback_data="col")],
-          [InlineKeyboardButton("👤 Профиль",callback_data="profile")],
-          [InlineKeyboardButton("🔍 Найти трек",callback_data="shazam_info")]]
-    await update.message.reply_text(msg,reply_markup=InlineKeyboardMarkup(kb))
+    await update.message.reply_text(msg,reply_markup=InlineKeyboardMarkup(menu_kb()))
+
+async def cmd_open(update: Update, context):
+    uid = str(update.effective_user.id)
+    users = get_users(); ratings = get_ratings(); tracks = get_tracks()
+    if uid not in users:
+        users[uid] = {"nick":update.effective_user.first_name or "Игрок","username":update.effective_user.username or "","collection":[],"last_open":None,"created_at":datetime.now().isoformat(),"banned":False}
+        save_user(uid, users[uid])
+    await do_open(update, context, uid, users[uid], tracks, ratings)
+
+async def cmd_collection(update: Update, context):
+    uid = str(update.effective_user.id)
+    users = get_users()
+    if uid not in users: await update.message.reply_text("Сначала /start"); return
+    await do_col(update, context, users[uid])
+
+async def cmd_profile(update: Update, context):
+    uid = str(update.effective_user.id)
+    users = get_users()
+    if uid not in users: await update.message.reply_text("Сначала /start"); return
+    await do_profile(update, context, uid, users[uid])
+
+async def cmd_search(update: Update, context):
+    await update.message.reply_text("🔍 Отправь аудио или название трека.")
 
 async def button(update: Update, context):
     q = update.callback_query; await q.answer()
@@ -104,22 +165,10 @@ async def button(update: Update, context):
     u = users[uid]
     if u.get("banned"): await q.message.reply_text("🚫"); return
 
-    if q.data == "open":
-        if u.get("last_open") and datetime.now() - datetime.fromisoformat(u["last_open"]) < timedelta(hours=2):
-            left = timedelta(hours=2) - (datetime.now() - datetime.fromisoformat(u["last_open"]))
-            await q.message.reply_text(f"⏳ {left.seconds//3600}ч {(left.seconds%3600)//60}м"); return
-        if not tracks: await q.message.reply_text("Нет треков."); return
-        collected = [t["title"] for t in u["collection"]]
-        available = [t for t in tracks if t["title"] not in collected]
-        if not available: await q.message.reply_text("🎉 Всё собрано!"); return
-        track = weighted_choice(available, ratings).copy()
-        track["obtained_at"] = datetime.now().isoformat(); track["rated"] = False
-        u["last_open"] = datetime.now().isoformat(); u["collection"].append(track)
-        save_user(uid, u)
-        idx = len(u["collection"])-1
-        kb = [[InlineKeyboardButton(f"⭐ {i}",callback_data=f"rate_{i}_{idx}")] for i in range(1,6)]
-        await q.message.reply_text(f"🎁 {track['title']} — {track['artist']}\nОцени:",reply_markup=InlineKeyboardMarkup(kb))
-        if track.get("file_id"): await context.bot.send_audio(chat_id=uid,audio=track["file_id"],title=track["title"],performer=track["artist"])
+    if q.data == "open": await do_open(update, context, uid, u, tracks, ratings)
+    elif q.data == "col": await do_col(update, context, u)
+    elif q.data == "profile": await do_profile(update, context, uid, u)
+    elif q.data == "shazam_info": await cmd_search(update, context)
 
     elif q.data.startswith("rate_"):
         _,r,idx = q.data.split("_"); r,idx = int(r),int(idx)
@@ -131,22 +180,11 @@ async def button(update: Update, context):
             await q.message.reply_text(f"⭐ {r}/5 | {sum(rats)/len(rats):.1f} ({len(rats)})")
         else: await q.message.reply_text("Уже оценено!")
 
-    elif q.data == "col":
-        if not u.get("collection"): await q.message.reply_text("📦 Пусто.")
-        else:
-            kb = []
-            for i,t in enumerate(u["collection"]):
-                r = f"⭐{t.get('rating','?')}" if t.get("rated") else "—"
-                kb.append([InlineKeyboardButton(f"{i+1}. {t['title']} — {t['artist']} {r}",callback_data=f"listen_{i}")])
-            kb.append([InlineKeyboardButton("🎁 Подарить",callback_data="gift_menu"),InlineKeyboardButton("🔄 Обмен",callback_data="trade_menu")])
-            kb.append([InlineKeyboardButton("« Назад",callback_data="main_menu")])
-            await q.message.reply_text("📦",reply_markup=InlineKeyboardMarkup(kb))
-
     elif q.data.startswith("listen_"):
         idx = int(q.data.split("_")[1])
         if idx < len(u["collection"]) and u["collection"][idx].get("file_id"):
             t = u["collection"][idx]
-            await context.bot.send_audio(chat_id=uid,audio=t["file_id"],title=t["title"],performer=t["artist"])
+            await q.message.reply_audio(audio=t["file_id"],title=t["title"],performer=t["artist"])
 
     elif q.data == "gift_menu":
         if not u.get("collection"): await q.message.reply_text("Нечего.")
@@ -170,19 +208,8 @@ async def button(update: Update, context):
         context.user_data["trade_my_idx"] = int(q.data.split("_")[2])
         await q.message.reply_text("Введи @username:")
 
-    elif q.data == "profile":
-        rd = u.get("created_at","?")
-        if rd!="?": rd = datetime.fromisoformat(rd).strftime("%d.%m.%Y")
-        await q.message.reply_text(f"👤 {u['nick']}\n🆔 {uid}\n📅 {rd}\n🎵 {len(u['collection'])}")
-
-    elif q.data == "shazam_info": await q.message.reply_text("🔍 Отправь аудио или название.")
-
     elif q.data == "main_menu":
-        kb = [[InlineKeyboardButton("🎁 Открыть кейс",callback_data="open")],
-              [InlineKeyboardButton("📦 Коллекция",callback_data="col")],
-              [InlineKeyboardButton("👤 Профиль",callback_data="profile")],
-              [InlineKeyboardButton("🔍 Найти трек",callback_data="shazam_info")]]
-        await q.message.reply_text("🎵",reply_markup=InlineKeyboardMarkup(kb))
+        await q.message.reply_text("🎵",reply_markup=InlineKeyboardMarkup(menu_kb()))
 
 async def handle_text(update: Update, context):
     uid = str(update.effective_user.id)
@@ -194,7 +221,7 @@ async def handle_text(update: Update, context):
             if tracks:
                 track = weighted_choice(tracks, ratings)
                 await update.message.reply_text(f"🧪 {track['title']} ({track.get('rarity','common')})")
-                if track.get("file_id"): await context.bot.send_audio(chat_id=uid,audio=track["file_id"],title=track["title"],performer=track["artist"])
+                if track.get("file_id"): await update.message.reply_audio(audio=track["file_id"],title=track["title"],performer=track["artist"])
             else: await update.message.reply_text("Нет треков.")
             return
         if "pending_file_id" in context.user_data:
@@ -333,7 +360,11 @@ async def button_admin(update: Update, context):
 
 def main():
     app = Application.builder().token(TOKEN).build()
-    app.add_handler(CommandHandler("start",start))
+    app.add_handler(CommandHandler("start",cmd_start))
+    app.add_handler(CommandHandler("open",cmd_open))
+    app.add_handler(CommandHandler("collection",cmd_collection))
+    app.add_handler(CommandHandler("profile",cmd_profile))
+    app.add_handler(CommandHandler("search",cmd_search))
     app.add_handler(CallbackQueryHandler(button,pattern="^(?!addrar_|trade_acc_|trade_dec_|req_admin).*"))
     app.add_handler(CallbackQueryHandler(button_admin,pattern="^(addrar_|trade_acc_|trade_dec_|req_admin)"))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND,handle_text))
