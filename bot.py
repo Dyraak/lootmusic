@@ -309,12 +309,15 @@ async def handle_text(update: Update, context):
         del context.user_data["awaiting_request"]; await update.message.reply_text("✅"); return
 
     query = text.lower().strip()
-    matches = difflib.get_close_matches(query,[t["title"].lower() for t in tracks],n=3,cutoff=0.4)
+    all_items = [t["title"].lower() for t in tracks] + [t["artist"].lower() for t in tracks]
+    matches = difflib.get_close_matches(query, all_items, n=5, cutoff=0.4)
     if matches:
         txt = "🔍 Найдено:\n"
+        seen = set()
         for m in matches:
             for t in tracks:
-                if t["title"].lower()==m:
+                if (t["title"].lower() == m or t["artist"].lower() == m) and t["title"] not in seen:
+                    seen.add(t["title"])
                     avg=""
                     if t["title"] in ratings and ratings[t["title"]]: avg=f" — ⭐{sum(ratings[t['title']])/len(ratings[t['title']]):.1f}"
                     txt+=f"• {t['title']} — {t['artist']}{avg}\n"
@@ -330,12 +333,15 @@ async def handle_audio(update: Update, context):
         context.user_data["pending_file_id"] = audio.file_id
         await update.message.reply_text("🎵 Введи: Название — Исполнитель"); return
     title = (audio.file_name or "").lower().strip()
-    matches = difflib.get_close_matches(title,[t["title"].lower() for t in tracks],n=3,cutoff=0.4)
+    all_items = [t["title"].lower() for t in tracks] + [t["artist"].lower() for t in tracks]
+    matches = difflib.get_close_matches(title, all_items, n=5, cutoff=0.4)
     if matches:
         txt="🔍 Найдено:\n"
+        seen = set()
         for m in matches:
             for t in tracks:
-                if t["title"].lower()==m:
+                if (t["title"].lower() == m or t["artist"].lower() == m) and t["title"] not in seen:
+                    seen.add(t["title"])
                     avg=""
                     if t["title"] in ratings and ratings[t["title"]]: avg=f" — ⭐{sum(ratings[t['title']])/len(ratings[t['title']]):.1f}"
                     txt+=f"• {t['title']} — {t['artist']}{avg}\n"
