@@ -223,6 +223,14 @@ async def handle_text(update: Update, context):
                 if track.get("file_id"): await update.message.reply_audio(audio=track["file_id"],title=track["title"],performer=track["artist"])
             else: await update.message.reply_text("Нет треков.")
             return
+                  if text == "/tracks":
+            if not tracks: await update.message.reply_text("Нет треков.")
+            else:
+                txt = "🎵 Треки в пуле:\n\n"
+                for t in tracks:
+                    txt += f"• {t['title']} — {t['artist']} ({t.get('rarity','common')})\n"
+                await update.message.reply_text(txt[:4000])
+            return
         if text == "/stats":
             await update.message.reply_text(f"👥 {len(users)}\n🎵 {len(tracks)}\n⭐ {sum(len(v) for v in ratings.values())}")
             return
