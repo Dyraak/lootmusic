@@ -117,8 +117,6 @@ async def do_profile(update, context, uid, u):
     if rd!="?": rd = datetime.fromisoformat(rd).strftime("%d.%m.%Y")
     await update.message.reply_text(f"👤 {u['nick']}\n🆔 {uid}\n📅 {rd}\n🎵 {len(u['collection'])}")
 
-async def do_search(update, context): pass  # handled in handle_text
-
 # КОМАНДЫ
 async def cmd_start(update: Update, context):
     uid = str(update.effective_user.id)
@@ -216,6 +214,7 @@ async def handle_text(update: Update, context):
     text = update.message.text.strip()
     users = get_users(); ratings = get_ratings(); tracks = get_tracks()
 
+    # АДМИН-КОМАНДЫ (проверяем первыми!)
     if update.effective_user.id == ADMIN_ID:
         if text == "/test":
             if tracks:
@@ -223,6 +222,38 @@ async def handle_text(update: Update, context):
                 await update.message.reply_text(f"🧪 {track['title']} ({track.get('rarity','common')})")
                 if track.get("file_id"): await update.message.reply_audio(audio=track["file_id"],title=track["title"],performer=track["artist"])
             else: await update.message.reply_text("Нет треков.")
+            return
+        if text == "/stats":
+            await update.message.reply_text(f"👥 {len(users)}\n🎵 {len(tracks)}\n⭐ {sum(len(v) for v in ratings.values())}")
+            return
+        if text.startswith("/broadcast "):
+            msg = text[11:]
+            for u in users:
+                try: await context.bot.send_message(chat_id=u,text=f"📢 {msg}")
+                except: pass
+            await update.message.reply_text("✅")
+            return
+        if text.startswith("/delete "):
+            remove_track(text[8:])
+            await update.message.reply_text("🗑 Удалён.")
+            return
+        if text.startswith("/ban "):
+            t = text[5:].replace("@","")
+            for i,u in users.items():
+                if u.get("username","")==t or u.get("nick","")==t:
+                    u["banned"]=True; save_user(i,u)
+                    await update.message.reply_text(f"🚫 {t}")
+                    return
+            await update.message.reply_text("Не найден.")
+            return
+        if text.startswith("/unban "):
+            t = text[7:].replace("@","")
+            for i,u in users.items():
+                if u.get("username","")==t or u.get("nick","")==t:
+                    u["banned"]=False; save_user(i,u)
+                    await update.message.reply_text(f"✅ {t}")
+                    return
+            await update.message.reply_text("Не найден.")
             return
         if "pending_file_id" in context.user_data:
             if " — " in text: title, artist = text.split(" — ",1)
@@ -232,25 +263,8 @@ async def handle_text(update: Update, context):
             kb = [[InlineKeyboardButton(r.capitalize(),callback_data=f"addrar_{r}")] for r in ["common","rare","epic","legendary"]]
             await update.message.reply_text(f"🎵 {title.strip()}\nРедкость:",reply_markup=InlineKeyboardMarkup(kb))
             return
-        if text.startswith("/broadcast "):
-            for u in users:
-                try: await context.bot.send_message(chat_id=u,text=f"📢 {text[11:]}")
-                except: pass
-            await update.message.reply_text("✅"); return
-        if text == "/stats":
-            await update.message.reply_text(f"👥 {len(users)}\n🎵 {len(tracks)}\n⭐ {sum(len(v) for v in ratings.values())}"); return
-        if text.startswith("/delete "): remove_track(text[8:]); await update.message.reply_text("🗑"); return
-        if text.startswith("/ban "):
-            t = text[5:].replace("@","")
-            for i,u in users.items():
-                if u.get("username","")==t or u.get("nick","")==t: u["banned"]=True; save_user(i,u); await update.message.reply_text(f"🚫 {t}"); return
-            await update.message.reply_text("Не найден."); return
-        if text.startswith("/unban "):
-            t = text[7:].replace("@","")
-            for i,u in users.items():
-                if u.get("username","")==t or u.get("nick","")==t: u["banned"]=False; save_user(i,u); await update.message.reply_text(f"✅ {t}"); return
-            await update.message.reply_text("Не найден."); return
 
+    # Остальные обработчики (подарки, обмен, поиск)
     if "gift_idx" in context.user_data:
         target = text.replace("@","").strip(); tid = None
         for i,u in users.items():
@@ -367,7 +381,7 @@ def main():
     app.add_handler(CommandHandler("search",cmd_search))
     app.add_handler(CallbackQueryHandler(button,pattern="^(?!addrar_|trade_acc_|trade_dec_|req_admin).*"))
     app.add_handler(CallbackQueryHandler(button_admin,pattern="^(addrar_|trade_acc_|trade_dec_|req_admin)"))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND,handle_text))
+    app.add_handler(MessageHandler(filters.TEXT,handle_text))
     app.add_handler(MessageHandler(filters.AUDIO,handle_audio))
     print("Бот запущен!")
     app.run_polling()
