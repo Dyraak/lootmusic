@@ -310,7 +310,7 @@ async def handle_text(update: Update, context):
 
     query = text.lower().strip()
     all_items = [t["title"].lower() for t in tracks] + [t["artist"].lower() for t in tracks]
-    matches = difflib.get_close_matches(query, all_items, n=5, cutoff=0.4)
+    matches = difflib.get_close_matches(query, all_items, n=5, cutoff=0.6)
     if matches:
         txt = "🔍 Найдено:\n"
         seen = set()
@@ -334,7 +334,7 @@ async def handle_audio(update: Update, context):
         await update.message.reply_text("🎵 Введи: Название — Исполнитель"); return
     title = (audio.file_name or "").lower().strip()
     all_items = [t["title"].lower() for t in tracks] + [t["artist"].lower() for t in tracks]
-    matches = difflib.get_close_matches(title, all_items, n=5, cutoff=0.4)
+    matches = difflib.get_close_matches(title, all_items, n=5, cutoff=0.6)
     if matches:
         txt="🔍 Найдено:\n"
         seen = set()
