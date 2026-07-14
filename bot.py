@@ -117,7 +117,6 @@ async def do_profile(update, context, uid, u):
     if rd!="?": rd = datetime.fromisoformat(rd).strftime("%d.%m.%Y")
     await update.message.reply_text(f"👤 {u['nick']}\n🆔 {uid}\n📅 {rd}\n🎵 {len(u['collection'])}")
 
-# КОМАНДЫ
 async def cmd_start(update: Update, context):
     uid = str(update.effective_user.id)
     users = get_users()
@@ -214,7 +213,7 @@ async def handle_text(update: Update, context):
     text = update.message.text.strip()
     users = get_users(); ratings = get_ratings(); tracks = get_tracks()
 
-    # АДМИН-КОМАНДЫ (проверяем первыми!)
+    # АДМИН
     if update.effective_user.id == ADMIN_ID:
         if text == "/test":
             if tracks:
@@ -223,46 +222,32 @@ async def handle_text(update: Update, context):
                 if track.get("file_id"): await update.message.reply_audio(audio=track["file_id"],title=track["title"],performer=track["artist"])
             else: await update.message.reply_text("Нет треков.")
             return
-                  if text == "/tracks":
-            if not tracks: await update.message.reply_text("Нет треков.")
-            else:
-                txt = "🎵 Треки в пуле:\n\n"
-                for t in tracks:
-                    txt += f"• {t['title']} — {t['artist']} ({t.get('rarity','common')})\n"
-                await update.message.reply_text(txt[:4000])
-            return
         if text == "/stats":
             await update.message.reply_text(f"👥 {len(users)}\n🎵 {len(tracks)}\n⭐ {sum(len(v) for v in ratings.values())}")
             return
+        if text == "/tracks":
+            if not tracks: await update.message.reply_text("Нет треков.")
+            else:
+                txt = "🎵 Треки в пуле:\n\n"
+                for t in tracks: txt += f"• {t['title']} — {t['artist']} ({t.get('rarity','common')})\n"
+                await update.message.reply_text(txt[:4000])
+            return
         if text.startswith("/broadcast "):
-            msg = text[11:]
             for u in users:
-                try: await context.bot.send_message(chat_id=u,text=f"📢 {msg}")
+                try: await context.bot.send_message(chat_id=u,text=f"📢 {text[11:]}")
                 except: pass
-            await update.message.reply_text("✅")
-            return
-        if text.startswith("/delete "):
-            remove_track(text[8:])
-            await update.message.reply_text("🗑 Удалён.")
-            return
+            await update.message.reply_text("✅"); return
+        if text.startswith("/delete "): remove_track(text[8:]); await update.message.reply_text("🗑"); return
         if text.startswith("/ban "):
             t = text[5:].replace("@","")
             for i,u in users.items():
-                if u.get("username","")==t or u.get("nick","")==t:
-                    u["banned"]=True; save_user(i,u)
-                    await update.message.reply_text(f"🚫 {t}")
-                    return
-            await update.message.reply_text("Не найден.")
-            return
+                if u.get("username","")==t or u.get("nick","")==t: u["banned"]=True; save_user(i,u); await update.message.reply_text(f"🚫 {t}"); return
+            await update.message.reply_text("Не найден."); return
         if text.startswith("/unban "):
             t = text[7:].replace("@","")
             for i,u in users.items():
-                if u.get("username","")==t or u.get("nick","")==t:
-                    u["banned"]=False; save_user(i,u)
-                    await update.message.reply_text(f"✅ {t}")
-                    return
-            await update.message.reply_text("Не найден.")
-            return
+                if u.get("username","")==t or u.get("nick","")==t: u["banned"]=False; save_user(i,u); await update.message.reply_text(f"✅ {t}"); return
+            await update.message.reply_text("Не найден."); return
         if "pending_file_id" in context.user_data:
             if " — " in text: title, artist = text.split(" — ",1)
             elif "-" in text: title, artist = text.split("-",1)
@@ -272,7 +257,7 @@ async def handle_text(update: Update, context):
             await update.message.reply_text(f"🎵 {title.strip()}\nРедкость:",reply_markup=InlineKeyboardMarkup(kb))
             return
 
-    # Остальные обработчики (подарки, обмен, поиск)
+    # Подарки, обмен, поиск
     if "gift_idx" in context.user_data:
         target = text.replace("@","").strip(); tid = None
         for i,u in users.items():
