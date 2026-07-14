@@ -84,25 +84,25 @@ def menu_kb():
           [InlineKeyboardButton("👤 Профиль",callback_data="profile")],
           [InlineKeyboardButton("🔍 Найти трек",callback_data="shazam_info")]]
 
-async def do_open(update, context, uid, u, tracks, ratings):
+async def do_open(msg, uid, u, tracks, ratings, context):
     if u.get("last_open") and datetime.now() - datetime.fromisoformat(u["last_open"]) < timedelta(hours=2):
         left = timedelta(hours=2) - (datetime.now() - datetime.fromisoformat(u["last_open"]))
-        await update.message.reply_text(f"⏳ {left.seconds//3600}ч {(left.seconds%3600)//60}м"); return
-    if not tracks: await update.message.reply_text("Нет треков."); return
+        await msg.reply_text(f"⏳ {left.seconds//3600}ч {(left.seconds%3600)//60}м"); return
+    if not tracks: await msg.reply_text("Нет треков."); return
     collected = [t["title"] for t in u["collection"]]
     available = [t for t in tracks if t["title"] not in collected]
-    if not available: await update.message.reply_text("🎉 Всё собрано!"); return
+    if not available: await msg.reply_text("🎉 Всё собрано!"); return
     track = weighted_choice(available, ratings).copy()
     track["obtained_at"] = datetime.now().isoformat(); track["rated"] = False
     u["last_open"] = datetime.now().isoformat(); u["collection"].append(track)
     save_user(uid, u)
     idx = len(u["collection"])-1
     kb = [[InlineKeyboardButton(f"⭐ {i}",callback_data=f"rate_{i}_{idx}")] for i in range(1,6)]
-    await update.message.reply_text(f"🎁 {track['title']} — {track['artist']}\nОцени:",reply_markup=InlineKeyboardMarkup(kb))
-    if track.get("file_id"): await update.message.reply_audio(audio=track["file_id"],title=track["title"],performer=track["artist"])
+    await msg.reply_text(f"🎁 {track['title']} — {track['artist']}\nОцени:",reply_markup=InlineKeyboardMarkup(kb))
+    if track.get("file_id"): await context.bot.send_audio(chat_id=uid,audio=track["file_id"],title=track["title"],performer=track["artist"])
 
-async def do_col(update, context, u):
-    if not u.get("collection"): await update.message.reply_text("📦 Пусто.")
+async def do_col(msg, u):
+    if not u.get("collection"): await msg.reply_text("📦 Пусто.")
     else:
         kb = []
         for i,t in enumerate(u["collection"]):
@@ -110,12 +110,12 @@ async def do_col(update, context, u):
             kb.append([InlineKeyboardButton(f"{i+1}. {t['title']} — {t['artist']} {r}",callback_data=f"listen_{i}")])
         kb.append([InlineKeyboardButton("🎁 Подарить",callback_data="gift_menu"),InlineKeyboardButton("🔄 Обмен",callback_data="trade_menu")])
         kb.append([InlineKeyboardButton("« Назад",callback_data="main_menu")])
-        await update.message.reply_text("📦",reply_markup=InlineKeyboardMarkup(kb))
+        await msg.reply_text("📦",reply_markup=InlineKeyboardMarkup(kb))
 
-async def do_profile(update, context, uid, u):
+async def do_profile(msg, uid, u):
     rd = u.get("created_at","?")
     if rd!="?": rd = datetime.fromisoformat(rd).strftime("%d.%m.%Y")
-    await update.message.reply_text(f"👤 {u['nick']}\n🆔 {uid}\n📅 {rd}\n🎵 {len(u['collection'])}")
+    await msg.reply_text(f"👤 {u['nick']}\n🆔 {uid}\n📅 {rd}\n🎵 {len(u['collection'])}")
 
 async def cmd_start(update: Update, context):
     uid = str(update.effective_user.id)
@@ -135,19 +135,19 @@ async def cmd_open(update: Update, context):
     if uid not in users:
         users[uid] = {"nick":update.effective_user.first_name or "Игрок","username":update.effective_user.username or "","collection":[],"last_open":None,"created_at":datetime.now().isoformat(),"banned":False}
         save_user(uid, users[uid])
-    await do_open(update, context, uid, users[uid], tracks, ratings)
+    await do_open(update.message, uid, users[uid], tracks, ratings, context)
 
 async def cmd_collection(update: Update, context):
     uid = str(update.effective_user.id)
     users = get_users()
     if uid not in users: await update.message.reply_text("Сначала /start"); return
-    await do_col(update, context, users[uid])
+    await do_col(update.message, users[uid])
 
 async def cmd_profile(update: Update, context):
     uid = str(update.effective_user.id)
     users = get_users()
     if uid not in users: await update.message.reply_text("Сначала /start"); return
-    await do_profile(update, context, uid, users[uid])
+    await do_profile(update.message, uid, users[uid])
 
 async def cmd_search(update: Update, context):
     await update.message.reply_text("🔍 Отправь аудио или название трека.")
@@ -162,10 +162,10 @@ async def button(update: Update, context):
     u = users[uid]
     if u.get("banned"): await q.message.reply_text("🚫"); return
 
-    if q.data == "open": await do_open(update, context, uid, u, tracks, ratings)
-    elif q.data == "col": await do_col(update, context, u)
-    elif q.data == "profile": await do_profile(update, context, uid, u)
-    elif q.data == "shazam_info": await cmd_search(update, context)
+    if q.data == "open": await do_open(q.message, uid, u, tracks, ratings, context)
+    elif q.data == "col": await do_col(q.message, u)
+    elif q.data == "profile": await do_profile(q.message, uid, u)
+    elif q.data == "shazam_info": await q.message.reply_text("🔍 Отправь аудио или название трека.")
 
     elif q.data.startswith("rate_"):
         _,r,idx = q.data.split("_"); r,idx = int(r),int(idx)
@@ -181,7 +181,7 @@ async def button(update: Update, context):
         idx = int(q.data.split("_")[1])
         if idx < len(u["collection"]) and u["collection"][idx].get("file_id"):
             t = u["collection"][idx]
-            await q.message.reply_audio(audio=t["file_id"],title=t["title"],performer=t["artist"])
+            await context.bot.send_audio(chat_id=uid,audio=t["file_id"],title=t["title"],performer=t["artist"])
 
     elif q.data == "gift_menu":
         if not u.get("collection"): await q.message.reply_text("Нечего.")
@@ -213,7 +213,6 @@ async def handle_text(update: Update, context):
     text = update.message.text.strip()
     users = get_users(); ratings = get_ratings(); tracks = get_tracks()
 
-    # АДМИН
     if update.effective_user.id == ADMIN_ID:
         if text == "/test":
             if tracks:
@@ -257,7 +256,6 @@ async def handle_text(update: Update, context):
             await update.message.reply_text(f"🎵 {title.strip()}\nРедкость:",reply_markup=InlineKeyboardMarkup(kb))
             return
 
-    # Подарки, обмен, поиск
     if "gift_idx" in context.user_data:
         target = text.replace("@","").strip(); tid = None
         for i,u in users.items():
