@@ -228,7 +228,8 @@ async def handle_text(update: Update, context):
             if not tracks: await update.message.reply_text("Нет треков.")
             else:
                 txt = "🎵 Треки в пуле:\n\n"
-                for t in tracks: txt += f"• {t['title']} — {t['artist']} ({t.get('rarity','common')})\n"
+                for t in sorted(tracks, key=lambda x: x['title'].lower()):
+                    txt += f"• {t['title']} — {t['artist']} ({t.get('rarity','common')})\n"
                 await update.message.reply_text(txt[:4000])
             return
         if text.startswith("/broadcast "):
